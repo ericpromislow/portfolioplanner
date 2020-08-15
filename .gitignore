@@ -1,4 +1,6 @@
 *~
+data/*.csv
+categories.yml
 
 *.gem
 *.rbc
