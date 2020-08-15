@@ -10,6 +10,9 @@ path = File.expand_path("../lib", File.dirname($0))
 $: << path
 
 require 'common'
+
+# If this is going anywhere all the inputs will be based on plugins, not hardwired, 
+# and then we'll loop on them.
 require 'rbc'
 require 'td'
 require 'analyze'
