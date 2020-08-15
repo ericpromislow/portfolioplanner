@@ -1,0 +1,20 @@
+---
+CdnEq:
+- RBC
+- L
+- TD
+USEq:
+- INTC
+- APPL
+IntlEq:
+- MICR
+Resources:
+- USO
+- SLV
+- GLD
+Bonds:
+- VFV
+RealEstate:
+- REIT
+ShortTerm:
+- VSB
