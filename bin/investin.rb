@@ -6,8 +6,7 @@
 require 'date'
 require 'yaml'
 
-path = File.expand_path("../lib", File.dirname($0))
-$: << path
+$: << File.expand_path("../lib", File.dirname($0))
 
 require 'common'
 
@@ -58,11 +57,6 @@ td_paths.each do |path|
 end
 sources << source
 sources = deep_symbolize_keys(sources)
-
-require 'pp'
-# pp deep_symbolize_keys(sources)
-
-# puts sources.deep_symbolize_keys.to_yaml
 
 analyzer = Analyze::Analyzer.new("categories.yml")
 analyzer.process(sources)
