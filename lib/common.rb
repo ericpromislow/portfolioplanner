@@ -12,6 +12,7 @@ module Common
         accountLabel: "",
         cash: {},
         statedTotals: {},
+        statedInvestments: {},
         holdings: [],
       }
     end

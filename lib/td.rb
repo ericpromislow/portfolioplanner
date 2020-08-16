@@ -24,6 +24,8 @@ module TD
             entry[:cash][currency] = row[1]
           elsif row[0] == "Total Value"
             entry[:statedTotals][currency] = row[1]
+          elsif row[0] == "Investments"
+            entry[:statedInvestments][currency] = row[1]
           elsif row.size > 20 && row[0] == "Symbol" && row[1] == "Market"
             state =2
           end

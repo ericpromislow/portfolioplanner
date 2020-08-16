@@ -35,8 +35,9 @@ module RBC
           end
           currency = row[0].to_sym
           cash_total = row[1].to_f
-          entry[:cash][row[0]] = row[1]
-          entry[:statedTotals][row[0]] = row[total_idx]
+          entry[:cash][currency] = row[1]
+          entry[:statedTotals][currency] = row[total_idx]
+          entry[:statedInvestments][currency] = row[2]
         elsif state == 5
           break if row[0] == "Important Information"
           if row.size > 20
@@ -46,7 +47,7 @@ module RBC
               quantity: row[4],
               price: row[5],
               currency: row[6],
-              totalMarketValue: row[9],
+              totalMarketValue: row[10],
             }
           end
         end
