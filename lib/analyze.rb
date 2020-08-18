@@ -6,29 +6,28 @@ module Analyze
       @cash = { USD: 0, CAD: 0 }
       @investments = { USD: 0, CAD: 0 }
       @totals = { USD: 0, CAD: 0 }
-      @statedTotals = { USD: 0, CAD: 0 }
-      @statedInvestments = { USD: 0, CAD: 0 }
+      @stated_totals = { USD: 0, CAD: 0 }
+      @stated_investments = { USD: 0, CAD: 0 }
       @full_total = 0
       @desired_weights_by_category = {}
       @total_desired_weights = 0
-      categories = YAML.load(IO.read(categories_file))
-      @categories = categories.keys.map{|k| [k.to_s,0]}.to_h
+      categories = deep_symbolize_keys(YAML.load(IO.read(categories_file)))
+      @categories = categories.keys.map{|k| [k, 0]}.to_h
       @category_by_symbol = {}
       categories.each do |category, entry|
-        entry['symbols'].each do |symbol|
-          @category_by_symbol[symbol.to_s] = category
+        entry.fetch(:symbols).each do |weighted_symbol|
+          @category_by_symbol[weighted_symbol[:symbol]] = category
         end
-        desired_weight = entry['desired_weight'].to_f
+        desired_weight = entry.fetch(:desired_weight).to_f
         @total_desired_weights += desired_weight
         @desired_weights_by_category[category.to_sym] = desired_weight
       end
       total_desired_weights = @desired_weights_by_category.values.sum
       if total_desired_weights != 100
         @desired_weights_by_category.each do |k, v|
-          @desired_weights_by_category[k] = v/ total_desired_weights
+          @desired_weights_by_category[k] = (v/ total_desired_weights) * 100
         end
       end
-        
     end
     
     def process(investments)
@@ -55,12 +54,12 @@ module Analyze
           @full_total += adjusted_cash_total
           @totals[:CAD] += cdn_cash
           @totals[:USD] += us_cash
-          @categories["ShortTerm"] += adjusted_cash_total
+          @categories[:ShortTerm] += adjusted_cash_total
 
           # STATED TOTALS
 
-          entry[:statedTotals].each { |k, v| @statedTotals[k] += v.to_f }
-          entry[:statedInvestments].each { |k, v| @statedInvestments[k] += v.to_f }
+          entry[:stated_totals].each { |k, v| @stated_totals[k] += v.to_f }
+          entry[:stated_investments].each { |k, v| @stated_investments[k] += v.to_f }
 
           # Investments
 
@@ -81,40 +80,71 @@ module Analyze
         end
       end
 
-      def summary
-        puts "Full total: #{commatize(@full_total)}"
-        puts "category total check: #{commatize(@categories.values.sum)}"
-        if @categories.values.sum.round != @full_total.round
+      def get_summary
+        data = {
+          full_total: @full_total,
+          total_check_by_category: @categories.values.sum,
+          adjustments_by_category: []
+        }
+        if (@full_total - data[:total_check_by_category]).abs > 0.001
           abort("full-total check error")
         end
-        printf("%20s   %8s   %8s\n", "", "CAD", "US", "value")
-        %w/cash investments statedInvestments totals statedTotals/.each do | name |
+        h = {}
+        %w/cash investments stated_investments totals stated_totals/.each do |name|
           var = instance_eval("@#{name}")
-          printf("%20s  %10s  %10s\n", name, commatize(var[:CAD]), commatize(var[:USD]))
+          h[name.to_sym] = {
+            CAD: var[:CAD],
+            USD: var[:USD],
+          }
         end
-        puts("\n#{'=' * 50}\ncategories")
-        printf("%20s   %8s   %8s  %8s  %8s\n", "category", 'amount', 'actual %', 'desired %', 'delta')
-        running_deltas = 0
-        full_ratio = 0
+        data[:totals_by_category] = h
+
+        full_ratio = 0.0
+        running_deltas = 0.0
+        h = {}
         @categories.each do |category, total|
           actualFraction = total/@full_total
           full_ratio += actualFraction
-          desiredPercentage = @desired_weights_by_category[category.to_sym]
+          desiredPercentage = @desired_weights_by_category[category]
           desiredFraction = desiredPercentage / 100
           delta = @full_total * (desiredFraction - actualFraction)
           running_deltas += delta
-          printf("%20s %12s % 8.02f%% % 8.02f%%  %8.2f\n",
-                 category,
-                 commatize(total),
-                 100 * actualFraction,
-                 100 * desiredFraction,
-                 delta)
+          h[category] = {
+            total: total,
+            actualFraction: actualFraction,
+            desiredFraction: desiredFraction,
+            delta: delta,
+          }
         end
         if (full_ratio - 1.0).abs > 0.1
           abort "Ended up with a full_ratio of #{full_ratio}"
         end
         if running_deltas.abs > 0.01
           puts "Hey! sum of changes = #{running_deltas}"
+        end
+        data[:adjustments_by_category] = h
+
+        return data
+      end
+
+      def print_summary(summary=nil)
+        summary = get_summary() if summary.nil?
+        puts "Full total: #{commatize(summary[:full_total])}"
+        puts ""
+        printf("%20s   %8s   %8s\n", "", "CAD", "US", "value")
+        %i/cash investments stated_investments totals stated_totals/.each do | name |
+          var = summary[:totals_by_category][name]
+          printf("%20s  %10s  %10s\n", name, commatize(var[:CAD]), commatize(var[:USD]))
+        end
+        puts("\n#{'=' * 50}\ncategories")
+        printf("%20s   %8s   %8s  %8s  %8s\n", "category", 'amount', 'actual %', 'desired %', 'delta')
+        summary[:adjustments_by_category].each do |category, adjustment|
+          printf("%20s %12s % 8.02f%% % 8.02f%%  %8.2f\n",
+            category,
+            commatize(adjustment[:total]),
+            100 * adjustment[:actualFraction],
+            100 * adjustment[:desiredFraction],
+            adjustment[:delta])
         end
       end
           

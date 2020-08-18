@@ -1,0 +1,45 @@
+---
+accountName: RSP
+accountNum: RBC01
+usrate: 1.3259
+accountLabel: ''
+cash:
+  CAD: '68.45'
+  USD: '42.10'
+stated_totals:
+  CAD: '3600.00'
+  USD: '2600.00'
+stated_investments:
+  CAD: '3531.55'
+  USD: '2557.90'
+holdings:
+- type: Mutual Funds
+  symbol: RBF1034
+  quantity: '69.10'
+  price: '15.53'
+  currency: CAD
+  totalMarketValue: '1072.95'
+- type: ETFs and ETNs
+  symbol: ENB
+  quantity: '20.00'
+  price: '43.53'
+  currency: CAD
+  totalMarketValue: '870.60'
+- type: ETFs and ETNs
+  symbol: VFV
+  quantity: '20.00'
+  price: '79.40'
+  currency: CAD
+  totalMarketValue: '1588.00'
+- type: ETFs and ETNs
+  symbol: FIS
+  quantity: '10.00'
+  price: '156.16'
+  currency: USD
+  totalMarketValue: '1561.60'
+- type: ETFs and ETNs
+  symbol: IRM
+  quantity: '30.00'
+  price: '33.21'
+  currency: USD
+  totalMarketValue: '996.30'

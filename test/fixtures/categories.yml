@@ -1,0 +1,53 @@
+---
+CdnEq:
+  desired_weight: 15
+  symbols:
+    - symbol: RBF1015
+      desired_weight: 10
+    - symbol: CNR
+      desired_weight: 10
+    - symbol: VFV
+      desired_weight: 10
+    - symbol: SHOP
+      desired_weight: 10
+    - symbol: ABX
+      desired_weight: 10
+    - symbol: ENB
+      desired_weight: 10
+USEq:
+  desired_weight: 10
+  symbols:
+    - symbol: CTL
+      desired_weight: 10
+    - symbol: FIS
+      desired_weight: 10
+    - symbol: VOO
+      desired_weight: 10
+    - symbol: IRM
+      desired_weight: 10
+IntlEq:
+  desired_weight: 8
+  symbols:
+    - symbol: RBF1033
+      desired_weight: 10
+    - symbol: RBF1034
+      desired_weight: 10
+Resources:
+  desired_weight: 7
+  symbols:
+    - symbol: RBF1037
+      desired_weight: 10
+    - symbol: SLV
+      desired_weight: 10
+Bonds:
+  desired_weight: 24
+  symbols:
+    - symbol: VSB
+      desired_weight: 10
+ShortTerm:
+  desired_weight: 30
+  symbols:
+    - symbol: RBF1002
+      desired_weight: 10
+    - symbol: RBF1004
+      desired_weight: 10

@@ -12,8 +12,8 @@ require 'common'
 
 # If this is going anywhere all the inputs will be based on plugins, not hardwired, 
 # and then we'll loop on them.
-require 'rbc'
-require 'td'
+require 'parsers/rbc'
+require 'parsers/td'
 require 'analyze'
 
 def usage(msg=nil)
@@ -27,12 +27,15 @@ if ARGV.size < 2
 end
 
 date=ARGV[0]
-inputDir = ARGV[1]
+input_dir = ARGV[1]
 dateObj = Date.parse(date)
 
-rbc_paths = Dir.glob("#{inputDir}/Holdings [0-9]* #{dateObj.strftime('%B %d, %Y')}.csv")
+
+glob = dateObj.strftime(Parsers::RBC::FileNameGlobFormat)
+rbc_paths = Dir.glob(File.join(input_dir, glob))
 usage("No rbc files for date #{date}") if rbc_paths.size == 0
-td_paths = Dir.glob("#{inputDir}/[0-9A-Z]*-holdings-#{dateObj.strftime('%d-%b-%Y')}.csv")
+glob = dateObj.strftime(Parsers::TD::FileNameGlobFormat)
+td_paths = Dir.glob(File.join(input_dir, glob))
 usage("No td files for date #{date}") if td_paths.size == 0
 
 source = {
@@ -42,7 +45,7 @@ source = {
 sources = [
   source
 ]
-rbc_analyzer = RBC::Analyzer.new
+rbc_analyzer = Parsers::RBC::Analyzer.new
 rbc_paths.each do |path|
   source[:entries] << rbc_analyzer.parse(path)
 end
@@ -51,7 +54,7 @@ source = {
     sourceName: :TD,
     entries: []
   }
-td_analyzer = TD::Analyzer.new
+td_analyzer = Parsers::TD::Analyzer.new
 td_paths.each do |path|
   source[:entries] << td_analyzer.parse(path)
 end
@@ -60,4 +63,4 @@ sources = deep_symbolize_keys(sources)
 
 analyzer = Analyze::Analyzer.new("categories.yml")
 analyzer.process(sources)
-analyzer.summary
+analyzer.print_summary

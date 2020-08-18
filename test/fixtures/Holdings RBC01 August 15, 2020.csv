@@ -1,0 +1,23 @@
+"Holdings Export as of Aug 15, 2020 3:45:45 PM ET"
+
+Account: RBC01 - RSP Account
+
+"Balances as of Aug 15, 2020"
+Exchange Rate: 1 USD = 1.3259 CAD
+
+,Trailing 12 Mo Return,Unrealized Gain/Loss in CAD,Unrealized Gain/Loss in CAD (%),Combined Book Cost in CAD,Combined Book Cost in USD,Combined Total in CAD,Combined Total in USD
+,1.51%,1.00,14.22,12.00,15.00,18.00,25.00
+
+Currency,Cash,Investments,Total
+CAD,68.45,3531.55,3600.00
+USD,42.10,2557.90,2600.00
+
+,Product,Symbol,Name,Quantity,Last Price,Currency,Change $,Change %,Total Book Cost,Total Market Value,Unrealized Gain/Loss $,Unrealized Gain/Loss %,Average Cost,Annual Dividend Amount $,Dividend Ex Date,Load Type,RSP Eligibility,Automatic Investment Plan,DRIP Eligibility,Coupon Rate,Maturity Date,Expiration Date,Open Interest
+Canadian Holdings,Mutual Funds,RBF1034,RBC ASIAN EQUITY FUND SR D (1034),69.10,15.53,CAD,N/A,N/A,829.18,1072.95,243.78,29.40%,12.00,,,No Load,Yes,Yes,,,,,
+Canadian Holdings,ETFs and ETNs,ENB,ENBRIDGE,20.00,43.53,CAD,N/A,N/A,700.00,870.60,170.60,24.37%,35.00,,,No Load,Yes,Yes,,,,,
+Canadian Holdings,ETFs and ETNs,VFV,VANGUARD S&P 500 INDEX ETF TR UNIT,20.00,79.40,CAD,0.21,0.265184998105832%,1300.00,1588.00,288.00,22.15%,65.00,,,,,,Yes,,,,
+US Holdings,ETFs and ETNs,FIS,FIDELITY,10.00,156.16,USD,0.00,0%,1800.00,1561.60,-238.40,-13.24%,180.00,,,,,,Yes,,,,
+US Holdings,ETFs and ETNs,IRM,IRON MOUNTAIN,30.00,33.21,USD,0.36,0.951625693893734%,1230.00,996.30,-233.70,-19.00%,41.00,,,,,,No,,,,
+
+Important Information
+As your agreement for the

@@ -1,0 +1,24 @@
+---
+accountName: Direct Investing
+accountNum: TD01
+usrate: 0
+accountLabel: ''
+cash:
+  CAD: '96.00'
+stated_totals:
+  CAD: '5000.00'
+stated_investments:
+  CAD: '4904.00'
+holdings:
+- type: Stock
+  symbol: SHOP
+  quantity: '100'
+  price: '13.25'
+  currency: CAD
+  totalMarketValue: '1325.00'
+- type: Stock
+  symbol: ABX
+  quantity: '100'
+  price: '35.79'
+  currency: CAD
+  totalMarketValue: '3579.00'

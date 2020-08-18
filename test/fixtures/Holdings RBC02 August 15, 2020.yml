@@ -1,0 +1,24 @@
+---
+accountName: LIRA
+accountNum: RBC02
+usrate: 1.3259
+accountLabel: ''
+cash:
+  CAD: '49.61'
+stated_totals:
+  CAD: '1100.00'
+stated_investments:
+  CAD: '1050.39'
+holdings:
+- type: Mutual Funds
+  symbol: RBF1033
+  quantity: '27.54'
+  price: '24.45'
+  currency: CAD
+  totalMarketValue: '673.2'
+- type: Mutual Funds
+  symbol: RBF1037
+  quantity: '13.51'
+  price: '27.92'
+  currency: CAD
+  totalMarketValue: '377.19'

@@ -1,0 +1,30 @@
+---
+accountName: Margin
+accountNum: RBC03
+usrate: 1.3259
+accountLabel: ''
+cash:
+  USD: '91.70'
+stated_totals:
+  USD: '4200.00'
+stated_investments:
+  USD: '4108.30'
+holdings:
+- type: ETFs and ETNs
+  symbol: SLV
+  quantity: '30'
+  price: '24.58'
+  currency: USD
+  totalMarketValue: '737.4'
+- type: ETFs and ETNs
+  symbol: VOO
+  quantity: '10'
+  price: '309.51'
+  currency: USD
+  totalMarketValue: '3095.1'
+- type: Stocks
+  symbol: CTL
+  quantity: '20'
+  price: '13.79'
+  currency: USD
+  totalMarketValue: '275.8'

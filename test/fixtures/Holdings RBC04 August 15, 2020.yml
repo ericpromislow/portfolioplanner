@@ -1,0 +1,24 @@
+---
+accountName: TFSA
+accountNum: RBC04
+usrate: 1.3259
+accountLabel: ''
+cash:
+  CAD: '191.98'
+stated_totals:
+  CAD: '1600.00'
+stated_investments:
+  CAD: '1408.02'
+holdings:
+- type: Stocks
+  symbol: CNR
+  quantity: '10'
+  price: '135.9'
+  currency: CAD
+  totalMarketValue: '1359'
+- type: ETFs and ETNs
+  symbol: VSB
+  quantity: '2'
+  price: '24.51'
+  currency: CAD
+  totalMarketValue: '49.02'
