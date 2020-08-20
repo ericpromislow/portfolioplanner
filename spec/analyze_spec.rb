@@ -50,15 +50,23 @@ describe 'Analyze' do
         expect(totals_by_category[:investments][currency]).
           to be_within(0.001).of(totals_by_category[:stated_investments][currency])
         expect(totals_by_category[:totals][currency]).
-          to be_within(0.001).of(totals_by_category[:stated_totals][currency])
+          to be_within(0.001).of(totals_by_category[:stated_totals][currency]),
+            "#{currency}: expected totals_by_category[:totals][currency]=#{totals_by_category[:totals][currency]} to be within 0.001 of totals_by_category[:stated_totals][currency]=#{totals_by_category[:stated_totals][currency]}"
         expect(totals_by_category[:totals][currency]).
           to be_within(0.001).of(totals_by_category[:cash][currency] +
             totals_by_category[:investments][currency])
       end
 
       adjustments = summary[:adjustments_by_category]
-      expected_adjustments = {CdnEq: -5479.67, USEq: -5699.71, IntlEq: -17.12, Resources: 157.99,
-        Bonds: 5138.07, ShortTerm: 5900.42}
+      expected_adjustments = {:CdnEq=>-5458.51,
+        :USEq=>-5685.60,
+        :IntlEq=>-5.83,
+        :Resources=>167.87,
+        :Bonds=>5171.93,
+        :ShortTerm=>5884.66,
+        :UNCATEGORIZED=>-74.52}
+
+
       expected_adjustments.each do |category, expected_adjustment|
         adjustment = adjustments[category]
         expect(expected_adjustment).to be_within(0.01).of(adjustment[:delta])
@@ -95,15 +103,46 @@ describe 'Analyze' do
         :ShortTerm=>
           {:RBF1002=>{:value=>0, :weight=>25.0},
             :RBF1004=>{:value=>0, :weight=>25.0},
-            :cash=>{:value=>583.44542, :weight=>50.0}}}
+            :cash=>{:value=>641.52, :weight=>50.0}}}
       expected_data.each do |category, holdings|
         holdings.each do |symbol, block|
           expect(holdings_by_category[category][symbol][:value]).
-            to be_within(0.001).of(block[:value]), "failed to match value of #{category}/#{symbol}"
+            to be_within(0.001).of(block[:value]), "failed to match value of #{category}/#{symbol}, got #{block[:value]}"
           expect(summary[:holdings_by_category][category][symbol][:weight]).
-            to be_within(0.001).of(block[:weight]), "failed to match weight of #{category}/#{symbol}"
+            to be_within(0.001).of(block[:weight]), "failed to match weight of #{category}/#{symbol}, got #{block[:weight]}"
         end
       end
+    end
+  end
+
+  describe 'stock not categorized' do
+
+    before do
+      dateObj = Date.parse('2020-08-15')
+      fmt = "Holdings RBC01 %B %d, %Y.csv"
+      glob = dateObj.strftime(fmt)
+      rbc_paths = Dir.glob(File.join(@input_dir, glob))
+      expect(rbc_paths.size).to eq(1)
+      analyzer = Parsers::RBC::Analyzer.new
+      entries = [analyzer.parse(rbc_paths[0])]
+
+      sources = [
+        {
+          sourceName: :RBC,
+          entries: entries
+        },
+      ]
+
+      @analyzer = Analyze::Analyzer.new(File.join(@input_dir, "categories.yml"))
+      @analyzer.process(sources)
+    end
+
+    it 'should assign the missing stock a zero weight' do
+      summary = @analyzer.get_summary()
+      uncategorized_equities = summary[:holdings_by_category][:UNCATEGORIZED]
+      expect(uncategorized_equities).to include(:ORCL)
+      expect(uncategorized_equities[:ORCL][:value]).to be_within(0.001).of(74.5156)
+      expect(uncategorized_equities[:ORCL][:weight]).to eq(0)
     end
   end
 end

@@ -15,7 +15,11 @@ module Analyze
       @categories = data.keys.map{|k| [k, 0]}.to_h
       @category_by_symbol = {}
       weight_by_symbol = {}
-      @holdings_by_category = {}
+      @holdings_by_category = { UNCATEGORIZED: Hash.new {|hash, key| hash[key] = {value:0}}}
+
+      # Handle uncategorized entries
+      @categories[:UNCATEGORIZED] = 0
+      @desired_weights_by_category[:UNCATEGORIZED] = 0
 
       data.each do |category, entry|
         @holdings_by_category[category] ||= Hash.new {|hash, key| hash[key] = {value:0}}
@@ -93,10 +97,13 @@ module Analyze
               raise Exception.new("Awp: have us currency but no us rate")
             end
             adjusted_market_value = currency == :USD ? market_value * @usrate : market_value
-            category = @category_by_symbol.fetch(symbol)
+            category = @category_by_symbol[symbol] || :UNCATEGORIZED
             @categories[category] += adjusted_market_value
 
             @holdings_by_category[category][symbol][:value] += adjusted_market_value
+            if @category_by_symbol[symbol].nil?
+              @holdings_by_category[category][symbol][:weight] = 0
+            end
             @investments[currency] += market_value
             @full_total += adjusted_market_value
             @totals[currency] += market_value

@@ -5,41 +5,47 @@ usrate: 1.3259
 accountLabel: ''
 cash:
   CAD: '68.45'
-  USD: '42.10'
+  USD: '85.90'
 stated_totals:
   CAD: '3600.00'
-  USD: '2600.00'
+  USD: '2700.00'
 stated_investments:
   CAD: '3531.55'
-  USD: '2557.90'
+  USD: '2614.10'
 holdings:
 - type: Mutual Funds
   symbol: RBF1034
-  quantity: '69.10'
+  quantity: '69.1'
   price: '15.53'
   currency: CAD
   totalMarketValue: '1072.95'
 - type: ETFs and ETNs
   symbol: ENB
-  quantity: '20.00'
+  quantity: '20'
   price: '43.53'
   currency: CAD
-  totalMarketValue: '870.60'
+  totalMarketValue: '870.6'
 - type: ETFs and ETNs
   symbol: VFV
-  quantity: '20.00'
-  price: '79.40'
+  quantity: '20'
+  price: '79.4'
   currency: CAD
-  totalMarketValue: '1588.00'
+  totalMarketValue: '1588'
 - type: ETFs and ETNs
   symbol: FIS
-  quantity: '10.00'
+  quantity: '10'
   price: '156.16'
   currency: USD
-  totalMarketValue: '1561.60'
+  totalMarketValue: '1561.6'
 - type: ETFs and ETNs
   symbol: IRM
-  quantity: '30.00'
+  quantity: '30'
   price: '33.21'
   currency: USD
-  totalMarketValue: '996.30'
+  totalMarketValue: '996.3'
+- type: ETFs and ETNs
+  symbol: ORCL
+  quantity: '1.00'
+  price: '56.00'
+  currency: USD
+  totalMarketValue: '56.20'

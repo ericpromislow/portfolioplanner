@@ -37,11 +37,11 @@ describe "Load Files" do
       accountName:'RSP',
       :accountNum=>"RBC01",
       :usrate=>1.3259,
-      :cash=>{CAD:"68.45", USD:"42.10"},
-      :stated_totals=>{CAD:"3600.00", USD:"2600.00"},
-      :stated_investments=>{CAD:"3531.55", USD:"2557.90"},
+      :cash=>{CAD:"68.45", USD:"85.90"},
+      :stated_totals=>{CAD:"3600.00", USD:"2700.00"},
+      :stated_investments=>{CAD:"3531.55", USD:"2614.10"},
     )
-    expect(entries[0][:holdings].size).to eq(5)
+    expect(entries[0][:holdings].size).to eq(6)
 
     expect(entries[1]).to include(
       accountName:'LIRA',
