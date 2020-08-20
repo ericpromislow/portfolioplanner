@@ -135,19 +135,34 @@ module Analyze
         running_deltas = 0.0
         h = {}
         @categories.each do |category, total|
-          actualFraction = total/@full_total
-          full_ratio += actualFraction
-          desiredPercentage = @desired_weights_by_category[category]
-          desiredFraction = desiredPercentage / 100
-          delta = @full_total * (desiredFraction - actualFraction)
-          running_deltas += delta
+          actual_fraction = total/@full_total
+          full_ratio += actual_fraction
+          desired_percentage = @desired_weights_by_category[category]
+          desired_fraction = desired_percentage / 100
+          desired_total_for_category = @full_total * desired_fraction
+          delta_for_category = @full_total * (desired_fraction - actual_fraction)
+          running_deltas += delta_for_category
           h[category] = {
             total: total,
-            actualFraction: actualFraction,
-            desiredFraction: desiredFraction,
-            delta: delta,
+            actualFraction: actual_fraction,
+            desiredFraction: desired_fraction,
+            delta: delta_for_category,
           }
+
+          # Readjust the delta's for each holding
+          running_delta_for_category = 0
+          @holdings_by_category[category].each do | symbol, holding_data |
+            current_value = holding_data[:value]
+            desired_value = holding_data[:weight]/100.0 * desired_total_for_category
+            delta_for_holding = desired_value - current_value
+            holding_data[:delta] = delta_for_holding
+            running_delta_for_category += delta_for_holding
+          end
+          if (running_delta_for_category - delta_for_category).abs > 0.01
+            raise Exception.new("running_delta_for_category for category #{category} is #{running_delta_for_category}, should be #{delta_for_category}")
+          end
           data[:holdings_by_category][category] = @holdings_by_category[category]
+
         end
         if (full_ratio - 1.0).abs > 0.1
           abort "Ended up with a full_ratio of #{full_ratio}"
@@ -178,12 +193,28 @@ module Analyze
         puts("\n#{'=' * 50}\ncategories")
         printf("%20s   %8s   %8s  %8s  %8s\n", "category", 'amount', 'actual %', 'desired %', 'delta')
         summary[:adjustments_by_category].each do |category, adjustment|
-          printf("%20s %12s % 8.02f%% % 8.02f%%  %8.2f\n",
+          printf("%20s %12s % 8.02f%% % 8.02f%% %11s\n",
             category,
             commatize(adjustment[:total]),
             100 * adjustment[:actualFraction],
             100 * adjustment[:desiredFraction],
-            adjustment[:delta])
+            commatize(adjustment[:delta]))
+          puts ''
+
+          holdings = summary[:holdings_by_category][category]
+          next if holdings.size == 0
+          # pp holdings
+          printf("%10s %19s %15s %20s %12s\n", "", *(%w/Holding Value Category-Desired% Delta/))
+          holdings.each do |symbol, holding|
+            printf("%10s %19s %15s % 19.02f%% %12s\n",
+              '',
+              symbol,
+              commatize(holding[:value]),
+              holding[:weight],
+              commatize(holding[:delta]))
+          end
+          puts ''
+          puts '-' * 80
         end
       end
           

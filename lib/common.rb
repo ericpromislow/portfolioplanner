@@ -36,7 +36,12 @@ end
 
 def commatize(num)
   whole, part = ("%.2f" % num).split('.')
-  "%s.%s" % [whole.reverse.scan(/\d{3}|.+/).join(",").reverse, part]
+  if whole[0] == '-'
+    sign = whole.slice!(0)
+  else
+    sign = ''
+  end
+  "%s%s.%s" % [sign, whole.reverse.scan(/\d{3}|.+/).join(",").reverse, part]
 end
 
 __END__

@@ -74,7 +74,9 @@ describe 'Analyze' do
     end
 
     it 'can print a summary' do
-      @analyzer.print_summary
+      expect {
+        @analyzer.print_summary
+      }.to output(/ORCL           74.52                0.00%       -74.52/).to_stdout
     end
 
     it 'can weight the stocks' do
@@ -82,34 +84,45 @@ describe 'Analyze' do
       holdings_by_category = summary[:holdings_by_category]
       expect(holdings_by_category.size).to eq(summary[:adjustments_by_category].size)
       expected_data = {:CdnEq=>
-        {:RBF1015=>{:value=>0, :weight=>16.666666666666668},
-          :CNR=>{:value=>1359.0, :weight=>16.666666666666668},
-          :VFV=>{:value=>1588.0, :weight=>16.666666666666668},
-          :SHOP=>{:value=>1325.0, :weight=>16.666666666666668},
-          :ABX=>{:value=>3579.0, :weight=>16.666666666666668},
-          :ENB=>{:value=>870.6, :weight=>16.666666666666668}},
+        {:RBF1015=>
+          {:value=>0, :weight=>16.666666666666668, :delta=>543.848670212766},
+          :CNR=>
+            {:value=>1359.0, :weight=>16.666666666666668, :delta=>-815.151329787234},
+          :VFV=>
+            {:value=>1588.0, :weight=>16.666666666666668, :delta=>-1044.1513297872339},
+          :SHOP=>
+            {:value=>1325.0, :weight=>16.666666666666668, :delta=>-781.151329787234},
+          :ABX=>
+            {:value=>3579.0, :weight=>16.666666666666668, :delta=>-3035.151329787234},
+          :ENB=>
+            {:value=>870.6, :weight=>16.666666666666668, :delta=>-326.751329787234}},
         :USEq=>
-          {:CTL=>{:value=>365.68322000000006, :weight=>25.0},
-            :FIS=>{:value=>2070.52544, :weight=>25.0},
-            :VOO=>{:value=>4103.79309, :weight=>25.0},
-            :IRM=>{:value=>1320.99417, :weight=>25.0}},
+          {:CTL=>
+            {:value=>365.68322000000006, :weight=>25.0, :delta=>178.16545021276585},
+            :FIS=>{:value=>2070.52544, :weight=>25.0, :delta=>-1526.676769787234},
+            :VOO=>{:value=>4103.79309, :weight=>25.0, :delta=>-3559.9444197872344},
+            :IRM=>{:value=>1320.99417, :weight=>25.0, :delta=>-777.145499787234}},
         :IntlEq=>
-          {:RBF1033=>{:value=>673.2, :weight=>50.0},
-            :RBF1034=>{:value=>1072.95, :weight=>50.0}},
+          {:RBF1033=>{:value=>673.2, :weight=>50.0, :delta=>196.9578723404254},
+            :RBF1034=>{:value=>1072.95, :weight=>50.0, :delta=>-202.7921276595746}},
         :Resources=>
-          {:RBF1037=>{:value=>377.19, :weight=>50.0},
-            :SLV=>{:value=>977.71866, :weight=>50.0}},
-        :Bonds=>{:VSB=>{:value=>49.02, :weight=>100.0}},
+          {:RBF1037=>{:value=>377.19, :weight=>50.0, :delta=>384.1981382978723},
+            :SLV=>{:value=>977.71866, :weight=>50.0, :delta=>-216.33052170212773}},
+        :Bonds=>{:VSB=>{:value=>49.02, :weight=>100.0, :delta=>5171.927234042552}},
         :ShortTerm=>
-          {:RBF1002=>{:value=>0, :weight=>25.0},
-            :RBF1004=>{:value=>0, :weight=>25.0},
-            :cash=>{:value=>641.52, :weight=>50.0}}}
+          {:RBF1002=>{:value=>0, :weight=>25.0, :delta=>1631.546010638298},
+            :RBF1004=>{:value=>0, :weight=>25.0, :delta=>1631.546010638298},
+            :cash=>{:value=>641.51984, :weight=>50.0, :delta=>2621.572181276596}},
+        :UNCATEGORIZED=>
+          {:ORCL=>{:value=>74.51558000000001, :weight=>0, :delta=>-74.51558000000001}}}
       expected_data.each do |category, holdings|
         holdings.each do |symbol, block|
           expect(holdings_by_category[category][symbol][:value]).
-            to be_within(0.001).of(block[:value]), "failed to match value of #{category}/#{symbol}, got #{block[:value]}"
-          expect(summary[:holdings_by_category][category][symbol][:weight]).
-            to be_within(0.001).of(block[:weight]), "failed to match weight of #{category}/#{symbol}, got #{block[:weight]}"
+            to be_within(0.01).of(block[:value]), "failed to match value of #{category}/#{symbol}, got #{holdings_by_category[category][symbol][:value]}"
+          expect(holdings_by_category[category][symbol][:weight]).
+            to be_within(0.01).of(block[:weight]), "failed to match weight of #{category}/#{symbol}, got #{holdings_by_category[category][symbol][:weight]}"
+          expect(holdings_by_category[category][symbol][:delta]).
+            to be_within(0.01).of(block[:delta]), "failed to match delta of #{category}/#{symbol}, got #{holdings_by_category[category][symbol][:delta]}"
         end
       end
     end
