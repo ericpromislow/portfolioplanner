@@ -11,23 +11,44 @@ module Analyze
       @full_total = 0
       @desired_weights_by_category = {}
       @total_desired_weights = 0
-      categories = deep_symbolize_keys(YAML.load(IO.read(categories_file)))
-      @categories = categories.keys.map{|k| [k, 0]}.to_h
+      data = deep_symbolize_keys(YAML.load(IO.read(categories_file)))
+      @categories = data.keys.map{|k| [k, 0]}.to_h
       @category_by_symbol = {}
-      categories.each do |category, entry|
-        entry.fetch(:symbols).each do |weighted_symbol|
-          @category_by_symbol[weighted_symbol[:symbol]] = category
+      weight_by_symbol = {}
+      @holdings_by_category = {}
+
+      data.each do |category, entry|
+        @holdings_by_category[category] ||= Hash.new {|hash, key| hash[key] = {value:0}}
+        total_weight = 0
+        weighted_symbols = entry[:symbols]
+        weighted_symbols.each do |weighted_symbol|
+          symbol = weighted_symbol[:symbol].to_sym
+          @category_by_symbol[symbol] = category
+          @holdings_by_category[category][symbol][:weight] = weighted_symbol[:desired_weight]
+          weight_by_symbol[symbol] = weighted_symbol[:desired_weight]
+          total_weight += weighted_symbol[:desired_weight]
+        end
+        if (total_weight - 100.0).abs > 0.001
+          weighted_symbols.each do |weighted_symbol|
+            symbol = weighted_symbol[:symbol].to_sym
+            @holdings_by_category[category][symbol][:weight] = 100.0 * weight_by_symbol[symbol] / total_weight
+          end
         end
         desired_weight = entry.fetch(:desired_weight).to_f
         @total_desired_weights += desired_weight
         @desired_weights_by_category[category.to_sym] = desired_weight
       end
+
       total_desired_weights = @desired_weights_by_category.values.sum
       if total_desired_weights != 100
         @desired_weights_by_category.each do |k, v|
           @desired_weights_by_category[k] = (v/ total_desired_weights) * 100
         end
       end
+    end
+
+    def holding_default_hash
+      Hash.new {|hash, key| hash[key] = {value:0, weight:0}}
     end
     
     def process(investments)
@@ -55,6 +76,7 @@ module Analyze
           @totals[:CAD] += cdn_cash
           @totals[:USD] += us_cash
           @categories[:ShortTerm] += adjusted_cash_total
+          @holdings_by_category[:ShortTerm][:cash][:value] += adjusted_cash_total
 
           # STATED TOTALS
 
@@ -64,7 +86,7 @@ module Analyze
           # Investments
 
           entry[:holdings].each do |holding|
-            symbol = holding[:symbol]
+            symbol = holding[:symbol].to_sym
             currency = holding[:currency].to_sym
             market_value = holding[:totalMarketValue].to_f
             if currency == :USD && @usrate.nil?
@@ -73,6 +95,8 @@ module Analyze
             adjusted_market_value = currency == :USD ? market_value * @usrate : market_value
             category = @category_by_symbol.fetch(symbol)
             @categories[category] += adjusted_market_value
+
+            @holdings_by_category[category][symbol][:value] += adjusted_market_value
             @investments[currency] += market_value
             @full_total += adjusted_market_value
             @totals[currency] += market_value
@@ -84,7 +108,8 @@ module Analyze
         data = {
           full_total: @full_total,
           total_check_by_category: @categories.values.sum,
-          adjustments_by_category: []
+          adjustments_by_category: [],
+          holdings_by_category: {},
         }
         if (@full_total - data[:total_check_by_category]).abs > 0.001
           abort("full-total check error")
@@ -115,6 +140,7 @@ module Analyze
             desiredFraction: desiredFraction,
             delta: delta,
           }
+          data[:holdings_by_category][category] = @holdings_by_category[category]
         end
         if (full_ratio - 1.0).abs > 0.1
           abort "Ended up with a full_ratio of #{full_ratio}"
@@ -132,9 +158,15 @@ module Analyze
         puts "Full total: #{commatize(summary[:full_total])}"
         puts ""
         printf("%20s   %8s   %8s\n", "", "CAD", "US", "value")
-        %i/cash investments stated_investments totals stated_totals/.each do | name |
+        %i/cash investments totals /.each do | name |
           var = summary[:totals_by_category][name]
           printf("%20s  %10s  %10s\n", name, commatize(var[:CAD]), commatize(var[:USD]))
+          stated_name = "stated_#{name}"
+          stated_var = summary[:totals_by_category][stated_name]
+          if stated_var && ((stated_var[:CAD] - var[:CAD]).abs > 0.001 ||
+            (stated_var[:USD] - var[:USD]).abs > 0.001)
+            printf("%20s  %10s  %10s\n", name, commatize(stated_var[:CAD]), commatize(stated_var[:USD]))
+          end
         end
         puts("\n#{'=' * 50}\ncategories")
         printf("%20s   %8s   %8s  %8s  %8s\n", "category", 'amount', 'actual %', 'desired %', 'delta')

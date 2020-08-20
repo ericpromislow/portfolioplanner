@@ -51,3 +51,5 @@ ShortTerm:
       desired_weight: 10
     - symbol: RBF1004
       desired_weight: 10
+    - symbol: cash
+      desired_weight: 20
