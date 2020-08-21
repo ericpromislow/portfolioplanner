@@ -4,8 +4,6 @@ require 'yaml'
 
 require 'analyze'
 require 'common'
-
-
 require 'plugin_manager'
 
 describe 'Analyze' do

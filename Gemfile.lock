@@ -1,7 +1,18 @@
+GIT
+  remote: https://github.com/gorn/rspreadsheet.git
+  revision: 3ed63da4053b5f282e0f9ba224f88d85dc586285
+  specs:
+    rspreadsheet (0.5.3)
+      andand (>= 1.3)
+      libxml-ruby (>= 3.0)
+      rubyzip (>= 1.3)
+
 GEM
   remote: https://rubygems.org/
   specs:
+    andand (1.3.3)
     diff-lcs (1.4.4)
+    libxml-ruby (3.2.0)
     rspec (3.9.0)
       rspec-core (~> 3.9.0)
       rspec-expectations (~> 3.9.0)
@@ -15,12 +26,14 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.3)
+    rubyzip (2.3.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   rspec
+  rspreadsheet!
 
 RUBY VERSION
    ruby 2.7.1p83

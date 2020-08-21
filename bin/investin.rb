@@ -12,6 +12,7 @@ require 'common'
 
 require 'plugin_manager'
 require 'analyze'
+require 'spreadsheet'
 
 def usage(msg=nil)
   $stderr.puts "Usage #{$0} yyyy-mm-dd inputDir"
@@ -42,3 +43,4 @@ end
 analyzer = Analyze::Analyzer.new("categories.yml")
 analyzer.process(sources)
 analyzer.print_summary
+Spreadsheet.new.create("tmp/full-summary-#{dateObj}.ods", analyzer.get_summary)
