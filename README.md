@@ -43,7 +43,7 @@ All of these things happen all the time:
 * You sell an investment and its price continues to rise.
 
 When you rebalance based on _a priori_ fixed percentages, and don't obsess daily or weekly with your portfolio changes,
-your less susceptible to that thinking.
+you're less susceptible to that thinking.
 
 ### Thought #3
 
