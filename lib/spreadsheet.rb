@@ -51,7 +51,7 @@ class Spreadsheet
       cell.format.bold = true
       row = write_holdings_by_category(row, summary, category, ws)
       @summary_rows << row
-      row = write_total_for_category(adjustment, first_row, row, ws)
+      row = write_total_for_category(adjustment, first_row, row, ws, summary[:holdings_by_category][category].size > 0)
     end
     return row
   end
@@ -65,15 +65,17 @@ class Spreadsheet
     end
   end
 
-  def write_total_for_category(adjustment, first_row, row, ws)
+  def write_total_for_category(adjustment, first_row, row, ws, have_items=true)
     write_bold_cell(row, 'B', "Total", ws)
     write_bold_cell(row, 'C', adjustment[:total], ws)
     write_bold_cell(row, 'D', adjustment[:actualFraction], ws)
     write_bold_cell(row, 'E', adjustment[:desiredFraction], ws)
     write_bold_cell(row, 'F', adjustment[:delta], ws)
-    cell = ws.cell(cellFromRCAlpha(row, "G"))
-    cell.formula = "=sum(%s:%s)" % [cellFromRCAlpha(first_row, "G"), cellFromRCAlpha(row - 1, "G")]
-    cell.format.bold = true
+    if have_items
+      cell = ws.cell(cellFromRCAlpha(row, "G"))
+      cell.formula = "=sum(%s:%s)" % [cellFromRCAlpha(first_row, "G"), cellFromRCAlpha(row - 1, "G")]
+      cell.format.bold = true
+    end
     return row + 1
   end
 
@@ -117,7 +119,7 @@ class Spreadsheet
     summary[:holdings_by_category][category].sort.each do |symbol, block|
       adjustment = summary[:adjustments_by_category][category]
       weight = block[:weight]
-      actual_percentage = (weight / 100.0) * adjustment[:actualFraction]
+      actual_percentage = block[:value] / summary[:full_total]
       desired_percentage = (weight / 100.0) * adjustment[:desiredFraction]
       write_cell(row, "B", symbol, ws)
       write_cell(row, "C", block[:value], ws)
