@@ -1,23 +1,22 @@
 # shared stuff
+#
+require 'plugin_manager'
 
-module Parsers
-  module Common
-
-    class Analyzer
-      def createEntry
-        return {
-          accountName: "",
-          accountNum: "",
-          usrate: 0,
-          accountLabel: "",
-          cash: {},
-          stated_totals: {},
-          stated_investments: {},
-          holdings: [],
-        }
-      end
-    end
-
+class BaseParser
+  def createEntry
+    return {
+      accountName: "",
+      accountNum: "",
+      usrate: 0,
+      accountLabel: "",
+      cash: {},
+      stated_totals: {},
+      stated_investments: {},
+      holdings: [],
+    }
   end
 
+  def self.inherited(klass)
+    PluginManager << klass
+  end
 end

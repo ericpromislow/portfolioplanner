@@ -1,9 +1,10 @@
 require 'rspec'
 require 'date'
-require 'common'
-require 'parsers/rbc'
-require 'parsers/td'
 require 'yaml'
+
+require 'common'
+
+require 'plugin_manager'
 
 def process_path(analyzer, entries, path)
   entry = analyzer.parse(path)
@@ -23,11 +24,12 @@ describe "Load Files" do
   
   it 'should load the rbc csv files' do
     dateObj = Date.parse('2020-08-15')
-    glob = dateObj.strftime(Parsers::RBC::FileNameGlobFormat)
+    rbcClass = PluginManager[:RBC]
+    glob = dateObj.strftime(rbcClass.const_get(:FileNameGlobFormat))
     rbc_paths = Dir.glob(File.join(@input_dir, glob))
     expect(rbc_paths.size).to eq(4)
 
-    analyzer = Parsers::RBC::Analyzer.new
+    analyzer = rbcClass.new
     entries = []
     rbc_paths.sort.each do |path|
       process_path(analyzer, entries, path)
@@ -76,11 +78,12 @@ describe "Load Files" do
 
   it 'should load the td csv files' do
     dateObj = Date.parse('2020-08-15')
-    glob = dateObj.strftime(Parsers::TD::FileNameGlobFormat)
+    tdClass = PluginManager[:TD]
+    glob = dateObj.strftime(tdClass.const_get(:FileNameGlobFormat))
     paths = Dir.glob(File.join(@input_dir, glob))
     expect(paths.size).to eq(1)
 
-    analyzer = Parsers::TD::Analyzer.new
+    analyzer = tdClass.new
     entries = []
     paths.each do |path|
       process_path(analyzer, entries, path)
@@ -95,5 +98,20 @@ describe "Load Files" do
       :stated_investments=>{CAD:"4904.00"},
     )
     expect(entries[0][:holdings].size).to eq(2)
+  end
+
+  it 'should load all types of csv files' do
+    dateObj = Date.parse('2020-08-15')
+    entries = []
+    PluginManager.each do |_, analyzerClass|
+      glob = dateObj.strftime(analyzerClass.const_get(:FileNameGlobFormat))
+      paths = Dir.glob(File.join(@input_dir, glob))
+
+      analyzer = analyzerClass.new
+      paths.sort.each do |path|
+        process_path(analyzer, entries, path)
+      end
+    end
+    expect(entries.size).to eq(5)
   end
 end

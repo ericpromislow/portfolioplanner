@@ -58,7 +58,7 @@ module Analyze
     def process(investments)
       investments.each do |investment|
         investment[:entries].each do |entry|
-          if !@usrate && entry[:usrate]
+          if !@usrate && entry[:usrate].to_f != 0
             @usrate = entry[:usrate]
           end
 
@@ -191,8 +191,16 @@ module Analyze
           end
         end
         puts("\n#{'=' * 50}\ncategories")
-        printf("%20s   %8s   %8s  %8s  %8s\n", "category", 'amount', 'actual %', 'desired %', 'delta')
-        summary[:adjustments_by_category].each do |category, adjustment|
+        printf("%20s   %8s   %8s  %8s  %8s\n\n", "category", 'amount', 'actual %', 'desired %', 'delta')
+        summary[:adjustments_by_category].sort do |h1, h2|
+          if h1[0] == :UNCATEGORIZED
+            1
+          elsif h2[0] == :UNCATEGORIZED
+            -1
+          else
+            h1[0] <=> h2[0]
+          end
+        end.each do |category, adjustment|
           printf("%20s %12s % 8.02f%% % 8.02f%% %11s\n",
             category,
             commatize(adjustment[:total]),
@@ -202,7 +210,10 @@ module Analyze
           puts ''
 
           holdings = summary[:holdings_by_category][category]
-          next if holdings.size == 0
+          if holdings.size == 0
+            puts '-' * 80
+            next
+          end
           # pp holdings
           printf("%10s %19s %15s %20s %12s\n", "", *(%w/Holding Value Category-Desired% Delta/))
           holdings.each do |symbol, holding|

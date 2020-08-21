@@ -10,10 +10,7 @@ $: << File.expand_path("../lib", File.dirname($0))
 
 require 'common'
 
-# If this is going anywhere all the inputs will be based on plugins, not hardwired, 
-# and then we'll loop on them.
-require 'parsers/rbc'
-require 'parsers/td'
+require 'plugin_manager'
 require 'analyze'
 
 def usage(msg=nil)
@@ -30,36 +27,17 @@ date=ARGV[0]
 input_dir = ARGV[1]
 dateObj = Date.parse(date)
 
+sources = []
+PluginManager.each do |analyzerName, analyzerClass|
+  glob = dateObj.strftime(analyzerClass.const_get(:FileNameGlobFormat))
+  paths = Dir.glob(File.join(input_dir, glob))
+  next if paths.size == 0
 
-glob = dateObj.strftime(Parsers::RBC::FileNameGlobFormat)
-rbc_paths = Dir.glob(File.join(input_dir, glob))
-usage("No rbc files for date #{date}") if rbc_paths.size == 0
-glob = dateObj.strftime(Parsers::TD::FileNameGlobFormat)
-td_paths = Dir.glob(File.join(input_dir, glob))
-usage("No td files for date #{date}") if td_paths.size == 0
-
-source = {
-    sourceName: :RBC,
-    entries: []
+  sources << {
+    sourceName: analyzerName,
+    entries: paths.map { |path| deep_symbolize_keys(analyzerClass.new.parse(path)) },
   }
-sources = [
-  source
-]
-rbc_analyzer = Parsers::RBC::Analyzer.new
-rbc_paths.each do |path|
-  source[:entries] << rbc_analyzer.parse(path)
 end
-
-source = {
-    sourceName: :TD,
-    entries: []
-  }
-td_analyzer = Parsers::TD::Analyzer.new
-td_paths.each do |path|
-  source[:entries] << td_analyzer.parse(path)
-end
-sources << source
-sources = deep_symbolize_keys(sources)
 
 analyzer = Analyze::Analyzer.new("categories.yml")
 analyzer.process(sources)

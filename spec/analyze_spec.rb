@@ -4,8 +4,9 @@ require 'yaml'
 
 require 'analyze'
 require 'common'
-require 'parsers/rbc'
-require 'parsers/td'
+
+
+require 'plugin_manager'
 
 describe 'Analyze' do
 
@@ -19,29 +20,24 @@ describe 'Analyze' do
   describe 'loading the data' do
     before do
       dateObj = Date.parse('2020-08-15')
-      glob = dateObj.strftime(Parsers::RBC::FileNameGlobFormat).sub(/\.csv\z/, '.yml')
-      rbc_paths = Dir.glob(File.join(@input_dir, glob))
-      expect(rbc_paths.size).to eq(4)
-      glob = dateObj.strftime(Parsers::TD::FileNameGlobFormat).sub(/\.csv\z/, '.yml')
-      td_paths = Dir.glob(File.join(@input_dir, glob))
-      expect(td_paths.size).to eq(1)
 
-      sources = [
-        {
-          sourceName: :RBC,
-          entries: rbc_paths.map {|path| deep_symbolize_keys(YAML.load_file(path))}
-        },
-        {
-          sourceName: :TD,
-          entries: td_paths.map {|path| deep_symbolize_keys(YAML.load_file(path))}
-        },
-      ]
+      sources = []
+      PluginManager.each do |className, analyzerClass|
+        glob = dateObj.strftime(analyzerClass.const_get(:FileNameGlobFormat).sub(/\.csv\z/, '.yml'))
+        paths = Dir.glob(File.join(@input_dir, glob))
+        sources << {
+          sourceName: className,
+          entries: paths.map {|path| deep_symbolize_keys(YAML.load_file(path))}
+        }
+      end
+      expect(sources.size).to eq(2)
+      expect(sources.sum {|source| source[:entries].size}).to eq(5)
 
       @analyzer = Analyze::Analyzer.new(File.join(@input_dir, "categories.yml"))
       @analyzer.process(sources)
     end
 
-    it 'should load the rbc csv files' do
+    it 'should get the summary' do
       summary = @analyzer.get_summary()
       expect(summary[:full_total]).to be_within(0.001).of(summary[:total_check_by_category])
 
@@ -136,7 +132,7 @@ describe 'Analyze' do
       glob = dateObj.strftime(fmt)
       rbc_paths = Dir.glob(File.join(@input_dir, glob))
       expect(rbc_paths.size).to eq(1)
-      analyzer = Parsers::RBC::Analyzer.new
+      analyzer = PluginManager[:RBC].new
       entries = [analyzer.parse(rbc_paths[0])]
 
       sources = [
