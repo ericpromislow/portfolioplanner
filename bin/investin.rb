@@ -43,4 +43,4 @@ end
 analyzer = Analyze::Analyzer.new("categories.yml")
 analyzer.process(sources)
 analyzer.print_summary
-Spreadsheet.new.create("tmp/full-summary-#{dateObj}.ods", analyzer.get_summary)
+Spreadsheet.new.create("tmp/full-summary-#{dateObj}.ods", analyzer)

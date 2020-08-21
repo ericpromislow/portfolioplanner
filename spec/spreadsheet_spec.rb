@@ -51,7 +51,7 @@ describe Spreadsheet do
 
     it 'can write to a spreadsheet' do
       spreadsheet = Spreadsheet.new
-      spreadsheet.create(@path, @analyzer.get_summary)
+      spreadsheet.create(@path, @analyzer)
     end
   end
 end

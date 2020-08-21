@@ -1,6 +1,7 @@
 ---
 CdnEq:
   desired_weight: 15
+  position: 1
   symbols:
     - symbol: RBF1015
       desired_weight: 10
@@ -15,7 +16,8 @@ CdnEq:
     - symbol: ENB
       desired_weight: 10
 USEq:
-  desired_weight: 10
+  desired_weight: 20
+  position: 2
   symbols:
     - symbol: CTL
       desired_weight: 10
@@ -27,6 +29,7 @@ USEq:
       desired_weight: 10
 IntlEq:
   desired_weight: 8
+  position: 3
   symbols:
     - symbol: RBF1033
       desired_weight: 10
@@ -34,17 +37,20 @@ IntlEq:
       desired_weight: 10
 Resources:
   desired_weight: 7
+  position: 4
   symbols:
     - symbol: RBF1037
       desired_weight: 10
     - symbol: SLV
       desired_weight: 10
 Bonds:
+  position: 6
   desired_weight: 24
   symbols:
     - symbol: VSB
       desired_weight: 10
 ShortTerm:
+  position: 5
   desired_weight: 30
   symbols:
     - symbol: RBF1002

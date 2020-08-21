@@ -14,6 +14,7 @@ module Analyze
       data = deep_symbolize_keys(YAML.load(IO.read(categories_file)))
       @categories = data.keys.map{|k| [k, 0]}.to_h
       @category_by_symbol = {}
+      @position_by_category = {}
       weight_by_symbol = {}
       @holdings_by_category = { UNCATEGORIZED: Hash.new {|hash, key| hash[key] = {value:0}}}
 
@@ -22,6 +23,7 @@ module Analyze
       @desired_weights_by_category[:UNCATEGORIZED] = 0
 
       data.each do |category, entry|
+        @position_by_category[category] = entry[:position]
         @holdings_by_category[category] ||= Hash.new {|hash, key| hash[key] = {value:0}}
         total_weight = 0
         weighted_symbols = entry[:symbols]
@@ -175,6 +177,29 @@ module Analyze
         return data
       end
 
+      def sorted_categories(summary)
+        decorated_keys = summary[:adjustments_by_category].keys.map { |k| [@position_by_category[k], k]}
+        decorated_keys.sort do |h1, h2|
+          pos1 = h1[0]
+          pos2 = h2[0]
+          if pos1
+            if pos2
+              pos1 <=> pos2
+            else
+              -1
+            end
+          elsif pos2
+            1
+          elsif h1[1] == :UNCATEGORIZED
+            1
+          elsif h2[1] == :UNCATEGORIZED
+            -1
+          else
+            h1[1] <=> h2[1]
+          end
+        end.map { |pos, key| key}
+      end
+
       def print_summary(summary=nil)
         summary = get_summary() if summary.nil?
         puts "Full total: #{commatize(summary[:full_total])}"
@@ -192,15 +217,8 @@ module Analyze
         end
         puts("\n#{'=' * 50}\ncategories")
         printf("%20s   %8s   %8s  %8s  %8s\n\n", "category", 'amount', 'actual %', 'desired %', 'delta')
-        summary[:adjustments_by_category].sort do |h1, h2|
-          if h1[0] == :UNCATEGORIZED
-            1
-          elsif h2[0] == :UNCATEGORIZED
-            -1
-          else
-            h1[0] <=> h2[0]
-          end
-        end.each do |category, adjustment|
+        sorted_categories(summary).each do |category|
+          adjustment = summary[:adjustments_by_category][category]
           printf("%20s %12s % 8.02f%% % 8.02f%% %11s\n",
             category,
             commatize(adjustment[:total]),

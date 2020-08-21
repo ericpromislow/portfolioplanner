@@ -1,7 +1,9 @@
 require 'rspreadsheet'
 
 class Spreadsheet
-  def create(path, summary)
+  def create(path, analyzer)
+    summary = analyzer.get_summary
+    @analyzer = analyzer
     workbook = Rspreadsheet.new
     ws = workbook.create_worksheet
     @summary_rows = []
@@ -36,15 +38,9 @@ class Spreadsheet
   end
 
   def write_adjustments_by_category(row, summary, ws)
-    summary[:adjustments_by_category].sort do |h1, h2|
-      if h1[0] == :UNCATEGORIZED
-        1
-      elsif h2[0] == :UNCATEGORIZED
-        -1
-      else
-        h1[0] <=> h2[0]
-      end
-    end.each do |category, adjustment|
+    sorted_keys = @analyzer.sorted_categories(summary)
+    sorted_keys.each do |category|
+      adjustment = summary[:adjustments_by_category][category]
       first_row = row
       cell = ws.cell(cellFromRCAlpha(row, 'A'))
       cell.value = category
@@ -75,6 +71,13 @@ class Spreadsheet
       cell = ws.cell(cellFromRCAlpha(row, "G"))
       cell.formula = "=sum(%s:%s)" % [cellFromRCAlpha(first_row, "G"), cellFromRCAlpha(row - 1, "G")]
       cell.format.bold = true
+
+      (first_row .. row - 1).to_a.each do |this_row|
+        cell = ws.cell(cellFromRCAlpha(this_row, "H"))
+        cell.formula = "=" + "(G%d/G$%d)*E$%d" % [this_row, row, row]
+        cell = ws.cell(cellFromRCAlpha(this_row, "I"))
+        cell.formula = "=" + "(H%d - D%d)*%s" % [this_row, this_row, @full_total_cell]
+      end
     end
     return row + 1
   end
@@ -102,13 +105,15 @@ class Spreadsheet
     cell.value = "Full Total"
     cell.format.bold = true
     cell = ws.cell(cellFromRCAlpha(row, 'C'))
+    @full_total_cell = "$C$%d" % row
     cell.value = summary[:full_total]
     cell.format.bold = true
     row + 1
   end
 
   def write_header(row, ws)
-    ['Category', nil, nil, 'Actual %', 'Target %', 'Move', 'Category Weight'].each_with_index do |val, i|
+    ['Category', nil, nil, 'Actual %', 'Target %', 'Move', 'Category Weight',
+    'Revised Target', 'Revised Move'].each_with_index do |val, i|
       next if val.nil?
       ws.cell(cellFromRCZero(row, i)).value = val
     end
