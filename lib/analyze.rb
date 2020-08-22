@@ -30,9 +30,10 @@ module Analyze
         weighted_symbols.each do |weighted_symbol|
           symbol = weighted_symbol[:symbol].to_sym
           @category_by_symbol[symbol] = category
-          @holdings_by_category[category][symbol][:weight] = weighted_symbol[:desired_weight]
-          weight_by_symbol[symbol] = weighted_symbol[:desired_weight]
-          total_weight += weighted_symbol[:desired_weight]
+          desired_weight = weighted_symbol[:desired_weight] || 1
+          @holdings_by_category[category][symbol][:weight] = desired_weight
+          weight_by_symbol[symbol] = desired_weight
+          total_weight += desired_weight
         end
         if (total_weight - 100.0).abs > 0.001
           weighted_symbols.each do |weighted_symbol|

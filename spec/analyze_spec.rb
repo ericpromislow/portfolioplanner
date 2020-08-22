@@ -52,12 +52,12 @@ describe 'Analyze' do
       end
 
       adjustments = summary[:adjustments_by_category]
-      expected_adjustments = {:CdnEq=>-5458.51,
-        :USEq=>-5685.60,
-        :IntlEq=>-5.83,
-        :Resources=>167.87,
-        :Bonds=>5171.93,
-        :ShortTerm=>5884.66,
+      expected_adjustments = {:CdnEq=>-5772.27,
+        :USEq=>-3928.55,
+        :IntlEq=>-173.17,
+        :Resources=>21.45,
+        :Bonds=>4669.91,
+        :ShortTerm=>5257.15,
         :UNCATEGORIZED=>-74.52}
 
 
@@ -79,34 +79,34 @@ describe 'Analyze' do
       expect(holdings_by_category.size).to eq(summary[:adjustments_by_category].size)
       expected_data = {:CdnEq=>
         {:RBF1015=>
-          {:value=>0, :weight=>16.666666666666668, :delta=>543.848670212766},
+          {:value=>0, :weight=>16.666666666666668, :delta=>491.555528846154},
           :CNR=>
-            {:value=>1359.0, :weight=>16.666666666666668, :delta=>-815.151329787234},
+            {:value=>1359.0, :weight=>16.666666666666668, :delta=>-867.444471153846},
           :VFV=>
-            {:value=>1588.0, :weight=>16.666666666666668, :delta=>-1044.1513297872339},
+            {:value=>1588.0, :weight=>16.666666666666668, :delta=>-1096.444471153846},
           :SHOP=>
-            {:value=>1325.0, :weight=>16.666666666666668, :delta=>-781.151329787234},
+            {:value=>1325.0, :weight=>16.666666666666668, :delta=>-833.444471153846},
           :ABX=>
-            {:value=>3579.0, :weight=>16.666666666666668, :delta=>-3035.151329787234},
+            {:value=>3579.0, :weight=>16.666666666666668, :delta=>-3087.444471153846},
           :ENB=>
-            {:value=>870.6, :weight=>16.666666666666668, :delta=>-326.751329787234}},
+            {:value=>870.6, :weight=>16.666666666666668, :delta=>-379.044471153846}},
         :USEq=>
           {:CTL=>
-            {:value=>365.68322000000006, :weight=>25.0, :delta=>178.16545021276585},
-            :FIS=>{:value=>2070.52544, :weight=>25.0, :delta=>-1526.676769787234},
-            :VOO=>{:value=>4103.79309, :weight=>25.0, :delta=>-3559.9444197872344},
-            :IRM=>{:value=>1320.99417, :weight=>25.0, :delta=>-777.145499787234}},
+            {:value=>365.68322000000006, :weight=>25.0, :delta=>617.4278376923082},
+            :FIS=>{:value=>2070.52544, :weight=>25.0, :delta=>-1087.4143823076915},
+            :VOO=>{:value=>4103.79309, :weight=>25.0, :delta=>-3120.6820323076918},
+            :IRM=>{:value=>1320.99417, :weight=>25.0, :delta=>-337.8831123076917}},
         :IntlEq=>
-          {:RBF1033=>{:value=>673.2, :weight=>50.0, :delta=>196.9578723404254},
-            :RBF1034=>{:value=>1072.95, :weight=>50.0, :delta=>-202.7921276595746}},
+          {:RBF1033=>{:value=>673.2, :weight=>50.0, :delta=>113.28884615384641},
+            :RBF1034=>{:value=>1072.95, :weight=>50.0, :delta=>-286.4611538461536}},
         :Resources=>
-          {:RBF1037=>{:value=>377.19, :weight=>50.0, :delta=>384.1981382978723},
-            :SLV=>{:value=>977.71866, :weight=>50.0, :delta=>-216.33052170212773}},
-        :Bonds=>{:VSB=>{:value=>49.02, :weight=>100.0, :delta=>5171.927234042552}},
+          {:RBF1037=>{:value=>377.19, :weight=>50.0, :delta=>310.9877403846156},
+            :SLV=>{:value=>977.71866, :weight=>50.0, :delta=>-289.5409196153844}},
+        :Bonds=>{:VSB=>{:value=>49.02, :weight=>100.0, :delta=>4669.913076923078}},
         :ShortTerm=>
-          {:RBF1002=>{:value=>0, :weight=>25.0, :delta=>1631.546010638298},
-            :RBF1004=>{:value=>0, :weight=>25.0, :delta=>1631.546010638298},
-            :cash=>{:value=>641.51984, :weight=>50.0, :delta=>2621.572181276596}},
+          {:RBF1002=>{:value=>0, :weight=>25.0, :delta=>1474.6665865384618},
+            :RBF1004=>{:value=>0, :weight=>25.0, :delta=>1474.6665865384618},
+            :cash=>{:value=>641.51984, :weight=>50.0, :delta=>2307.8133330769238}},
         :UNCATEGORIZED=>
           {:ORCL=>{:value=>74.51558000000001, :weight=>0, :delta=>-74.51558000000001}}}
       expected_data.each do |category, holdings|
