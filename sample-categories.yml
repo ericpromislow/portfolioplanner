@@ -39,6 +39,7 @@ Bonds:
     - symbol: VFV
       desired_weight: 3
 RealEstate:
+  desired_weight: 5
   symbols:
     - symbol: RMR
       desired_weight: 10
@@ -47,4 +48,6 @@ ShortTerm:
   position: 5
   symbols:
     - symbol: VSB
+      desired_weight: 10
+    - symbol: cash
       desired_weight: 10

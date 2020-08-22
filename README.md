@@ -19,7 +19,7 @@ ruby bin/investin.rb [options]
 See `sample-categories.yml` for guidance on how to build your own categories file.
 The category names aren't set, except for a builtin category called `UNCATEGORIZED` to
 group any uncategorized holdings, and you'll also need an entry called `cash` for
-the cash holdings.
+the cash holdings somewhere in the list.
 
 ## Legal stuff
 
