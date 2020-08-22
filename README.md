@@ -3,6 +3,24 @@ reads csv files from investment statements, emits normalized yaml
 
 uses a `categories.yml` file to categorize each investment in the category of your choice
 
+## Usage
+
+```
+ruby bin/investin.rb [options]
+     -d, --date STRING                read info for date yyyy-mm-dd
+     -i, --input-dir DIR              read csv files from DIR
+     -c, --categories FILE            read categories from FILE
+         --summary                    emit a summary to stdout
+     -s, --spreadsheet FILE           emit the spreadsheet to DIR/PATH
+     -f, --force-overwrite            overwrite existing spreadsheet
+     -h, --help                       show this info
+```
+
+See `sample-categories.yml` for guidance on how to build your own categories file.
+The category names aren't set, except for a builtin category called `UNCATEGORIZED` to
+group any uncategorized holdings, and you'll also need an entry called `cash` for
+the cash holdings.
+
 ## Legal stuff
 
 See `LICENSE` for copyright info.

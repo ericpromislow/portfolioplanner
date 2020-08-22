@@ -1,20 +1,50 @@
 ---
 CdnEq:
-- RBC
-- L
-- TD
+  desired_weight: 15
+  position: 2
+  symbols:
+    - symbol: RBC
+      desired_weight: 10
+    - symbol: L
+      desired_weight: 20
+    - symbol: TD
+      desired_weight: 30
 USEq:
-- INTC
-- APPL
+  desired_weight: 15
+  position: 1
+  symbols:
+    - symbol: INTC
+      desired_weight: 30
+    - symbol: APPL
+      desired_weight: 70
 IntlEq:
-- MICR
+  desired_weight: 5
+  position: 3
+  symbols:
+    - symbol: MICR
 Resources:
-- USO
-- SLV
-- GLD
+  desired_weight: 5
+  position: 6
+  symbols:
+    - symbol: USO
+      desired_weight: 3
+    - symbol: GLD
+      desired_weight: 10
+    - symbol: SLV
+      desired_weight: 10
 Bonds:
-- VFV
+  desired_weight: 5
+  position: 4
+  symbols:
+    - symbol: VFV
+      desired_weight: 3
 RealEstate:
-- REIT
+  symbols:
+    - symbol: RMR
+      desired_weight: 10
 ShortTerm:
-- VSB
+  desired_weight: 5
+  position: 5
+  symbols:
+    - symbol: VSB
+      desired_weight: 10
