@@ -47,7 +47,8 @@ class Spreadsheet
       cell.format.bold = true
       row = write_holdings_by_category(row, summary, category, ws)
       @summary_rows << row
-      row = write_total_for_category(adjustment, first_row, row, ws, summary[:holdings_by_category][category].size > 0)
+      row = write_total_for_category(adjustment, first_row, row, ws,
+        category != :UNCATEGORIZED && summary[:holdings_by_category][category].size > 0)
     end
     return row
   end

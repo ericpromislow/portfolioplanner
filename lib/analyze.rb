@@ -156,7 +156,15 @@ module Analyze
           running_delta_for_category = 0
           @holdings_by_category[category].each do | symbol, holding_data |
             current_value = holding_data[:value]
+            begin
             desired_value = holding_data[:weight]/100.0 * desired_total_for_category
+            rescue NoMethodError
+              if symbol == :cash && holding_data[:weight].nil?
+                $stderr.puts("You need to put an entry for 'cash' in the categories file")
+                exit 2
+              end
+            end
+
             delta_for_holding = desired_value - current_value
             holding_data[:delta] = delta_for_holding
             running_delta_for_category += delta_for_holding
