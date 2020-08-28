@@ -7,7 +7,9 @@ require 'csv'
 module Parsers
   class ManuLife < BaseParser
 
-    FileNameGlobFormat = "manulife-*-*-%Y-%m-%d.csv"
+    # Don't need this updated every day. Just once a month, or even by year
+    FileNameGlobFormat = "manulife-*-*-%Y-%m*.csv"
+    FileNameGlobFormatBackup = "manulife-*-*-%Y*.csv"
 
     def parse(path)
       entry = createEntry()

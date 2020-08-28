@@ -209,6 +209,10 @@ module Analyze
         end.map { |pos, key| key}
       end
 
+      def get_total
+        return @full_total
+      end
+
       def print_summary(summary=nil)
         summary = get_summary() if summary.nil?
         puts "Full total: #{commatize(summary[:full_total])}"

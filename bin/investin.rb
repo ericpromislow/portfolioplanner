@@ -13,6 +13,7 @@ require 'common'
 
 require 'plugin_manager'
 require 'analyze'
+require 'date_total_db'
 require 'spreadsheet'
 
 options = {}
@@ -84,7 +85,13 @@ sources = []
 PluginManager.each do |analyzerName, analyzerClass|
   glob = dateObj.strftime(analyzerClass.const_get(:FileNameGlobFormat))
   paths = Dir.glob(File.join(input_dir, glob))
-  next if paths.size == 0
+  if paths.size == 0
+    altGlobFormat = analyzerClass.const_get(:FileNameGlobFormatBackup)
+    next if !altGlobFormat
+    glob = dateObj.strftime(altGlobFormat)
+    paths = Dir.glob(File.join(input_dir, glob))
+    next if paths.size == 0
+  end
 
   sources << {
     sourceName: analyzerName,
@@ -105,13 +112,28 @@ end
 if (spreadsheet_location = options[:spreadsheet])
   if File.directory?(spreadsheet_location)
     path = File.join(spreadsheet_location, "full-summary-#{dateObj}.ods")
+    totals_path = File.join(spreadsheet_location, "totals.ods")
   else
     path = spreadsheet_location
+    totals_path = File.join(File.dirname(spreadsheet_location), "totals.ods")
   end
   if File.exist?(path) && !options[:forceOverwrite]
     puts "File #{path} already exists. Run with -f to overwrite"
     exit 0
   end
-  Spreadsheet.new.create(path, analyzer)
+  spreadsheeter = Spreadsheet.new
+  spreadsheeter.create(path, analyzer)
   system(%Q/open "#{path}"/)
+
+  total = analyzer.get_total
+  db = DateTotalDatabase.new(input_dir, "totals.db")
+  begin
+    db.add(date, total)
+    spreadsheeter.update_totals(db, totals_path)
+    system(%Q/open "#{totals_path}"/)
+  ensure
+    db.close
+  end
+
 end
+

@@ -5,3 +5,4 @@ ruby '2.7.1'
 
 gem "rspec"
 gem "rspreadsheet", git:'https://github.com/gorn/rspreadsheet.git'
+gem 'sqlite3'

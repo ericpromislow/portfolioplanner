@@ -23,6 +23,17 @@ class Spreadsheet
     workbook.save(path)
   end
 
+  def update_totals(db, path)
+    workbook = Rspreadsheet.new
+    ws = workbook.create_worksheet
+    rows = db.rows
+    rows.each_with_index do |row, i|
+      ws.cell("A#{i + 1}").value = row[0]
+      ws.cell("B#{i + 1}").value = row[1]
+    end
+    workbook.save(path)
+  end
+
   private
 
   def cellFromRCOne(row, column)

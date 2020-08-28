@@ -42,7 +42,7 @@ describe Spreadsheet do
           entries: paths.map {|path| deep_symbolize_keys(YAML.load_file(path))}
         }
       end
-      expect(sources.size).to eq(2)
+      expect(sources.size).to eq(3)
       expect(sources.sum {|source| source[:entries].size}).to eq(5)
 
       @analyzer = Analyze::Analyzer.new(File.join(@input_dir, "categories.yml"))
