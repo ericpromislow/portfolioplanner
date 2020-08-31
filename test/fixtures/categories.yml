@@ -49,13 +49,13 @@ Bonds:
   symbols:
     - symbol: VSB
       desired_weight: 10
+CASH:
+  desired_weight: 15
 ShortTerm:
   position: 5
-  desired_weight: 30
+  desired_weight: 15
   symbols:
     - symbol: RBF1002
       desired_weight: 10
     - symbol: RBF1004
       desired_weight: 10
-    - symbol: cash
-      desired_weight: 20

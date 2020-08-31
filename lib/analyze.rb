@@ -13,32 +13,40 @@ module Analyze
       @total_desired_weights = 0
       data = deep_symbolize_keys(YAML.load(IO.read(categories_file)))
       @categories = data.keys.map{|k| [k, 0]}.to_h
-      @category_by_symbol = {}
+      @category_by_symbol = { cash: :CASH }
       @position_by_category = {}
       weight_by_symbol = {}
-      @holdings_by_category = { UNCATEGORIZED: Hash.new {|hash, key| hash[key] = {value:0}}}
+      @holdings_by_category = {
+        UNCATEGORIZED: Hash.new {|hash, key| hash[key] = {value:0}},
+        CASH: { cash: { value: 0, weight: 100 }}
+      }
 
       # Handle uncategorized entries
       @categories[:UNCATEGORIZED] = 0
       @desired_weights_by_category[:UNCATEGORIZED] = 0
 
+
       data.each do |category, entry|
         @position_by_category[category] = entry[:position]
         @holdings_by_category[category] ||= Hash.new {|hash, key| hash[key] = {value:0}}
-        total_weight = 0
         weighted_symbols = entry[:symbols]
-        weighted_symbols.each do |weighted_symbol|
-          symbol = weighted_symbol[:symbol].to_sym
-          @category_by_symbol[symbol] = category
-          desired_weight = weighted_symbol[:desired_weight] || 1
-          @holdings_by_category[category][symbol][:weight] = desired_weight
-          weight_by_symbol[symbol] = desired_weight
-          total_weight += desired_weight
-        end
-        if (total_weight - 100.0).abs > 0.001
+        if weighted_symbols.nil?
+          raise "No symbols for category #{category}" unless category == :CASH
+        else
+          total_weight = 0
           weighted_symbols.each do |weighted_symbol|
             symbol = weighted_symbol[:symbol].to_sym
-            @holdings_by_category[category][symbol][:weight] = 100.0 * weight_by_symbol[symbol] / total_weight
+            @category_by_symbol[symbol] = category
+            desired_weight = weighted_symbol[:desired_weight] || 1
+            @holdings_by_category[category][symbol][:weight] = desired_weight
+            weight_by_symbol[symbol] = desired_weight
+            total_weight += desired_weight
+          end
+          if (total_weight - 100.0).abs > 0.001
+            weighted_symbols.each do |weighted_symbol|
+              symbol = weighted_symbol[:symbol].to_sym
+              @holdings_by_category[category][symbol][:weight] = 100.0 * weight_by_symbol[symbol] / total_weight
+            end
           end
         end
         desired_weight = entry.fetch(:desired_weight).to_f
@@ -82,8 +90,8 @@ module Analyze
           @full_total += adjusted_cash_total
           @totals[:CAD] += cdn_cash
           @totals[:USD] += us_cash
-          @categories[:ShortTerm] += adjusted_cash_total
-          @holdings_by_category[:ShortTerm][:cash][:value] += adjusted_cash_total
+          @categories[:CASH] += adjusted_cash_total
+          @holdings_by_category[:CASH][:cash][:value] += adjusted_cash_total
 
           # STATED TOTALS
 

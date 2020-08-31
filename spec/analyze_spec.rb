@@ -58,7 +58,8 @@ describe 'Analyze' do
         :IntlEq=>-173.17,
         :Resources=>21.45,
         :Bonds=>4669.91,
-        :ShortTerm=>5257.15,
+        :ShortTerm=>2949.33,
+        :CASH => 2307.81,
         :UNCATEGORIZED=>-74.52}
 
 
@@ -105,9 +106,13 @@ describe 'Analyze' do
             :SLV=>{:value=>977.71866, :weight=>50.0, :delta=>-289.5409196153844}},
         :Bonds=>{:VSB=>{:value=>49.02, :weight=>100.0, :delta=>4669.913076923078}},
         :ShortTerm=>
-          {:RBF1002=>{:value=>0, :weight=>25.0, :delta=>1474.6665865384618},
-            :RBF1004=>{:value=>0, :weight=>25.0, :delta=>1474.6665865384618},
-            :cash=>{:value=>641.51984, :weight=>50.0, :delta=>2307.8133330769238}},
+          {:RBF1002=>{:value=>0, :weight=>50.0, :delta=>1474.6665865384618},
+            :RBF1004=>{:value=>0, :weight=>50.0, :delta=>1474.6665865384618},},
+        :CASH =>
+          {
+            :cash=>{:value=>641.51984, :weight=>100.0, :delta=>2307.8133330769238},
+          },
+
         :UNCATEGORIZED=>
           {:ORCL=>{:value=>74.51558000000001, :weight=>0, :delta=>-74.51558000000001}}}
       expected_data.each do |category, holdings|
