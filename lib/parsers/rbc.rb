@@ -6,7 +6,7 @@ require 'csv'
 module Parsers
   class RBC < BaseParser
 
-    FileNameGlobFormat = "Holdings [A-Z0-9]* %B %d, %Y.csv"
+    FileNameGlobFormat = "Holdings [A-Z0-9]* %B %-d, %Y.csv"
 
     def parse(path)
       entry = createEntry()
