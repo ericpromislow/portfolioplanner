@@ -1,0 +1,30 @@
+---
+accountName: Margin
+accountNum: RBC03
+usrate: 1.0
+accountLabel: ''
+cash:
+  USD: '100.00'
+stated_totals:
+  USD: '605.00'
+stated_investments:
+  USD: '505.00'
+holdings:
+- type: ETFs and ETNs
+  symbol: SLV
+  quantity: '1'
+  price: '25.00'
+  currency: USD
+  totalMarketValue: '25.00'
+- type: ETFs and ETNs
+  symbol: VOO
+  quantity: '1'
+  price: '75.00'
+  currency: USD
+  totalMarketValue: '75.00'
+- type: Options
+  symbol: TSLA 091820 420 C
+  quantity: '1'
+  price: '4.05'
+  currency: USD
+  totalMarketValue: '405.00'
