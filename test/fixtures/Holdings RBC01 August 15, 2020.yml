@@ -45,7 +45,7 @@ holdings:
   totalMarketValue: '996.3'
 - type: ETFs and ETNs
   symbol: ORCL
-  quantity: '1.00'
-  price: '56.00'
+  quantity: '1'
+  price: '56'
   currency: USD
-  totalMarketValue: '56.20'
+  totalMarketValue: '56.2'

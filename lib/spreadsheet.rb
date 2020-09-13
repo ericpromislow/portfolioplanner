@@ -62,12 +62,14 @@ class Spreadsheet
       cell.format.bold = true
       row = write_holdings_by_category(row, summary, category, ws)
       @summary_rows << row
-      row = write_total_for_category(adjustment, first_row, row, ws,
-        category != :UNCATEGORIZED && summary[:holdings_by_category][category].size > 0)
+      row = write_total_for_category(adjustment, first_row, row, ws, has_adjustments(category, summary))
     end
     return row
   end
 
+  def has_adjustments(category, summary)
+    category != :UNCATEGORIZED && category != :TRADES && summary[:holdings_by_category][category].size > 0
+  end
 
   def write_final_totals(row, ws)
     write_bold_cell(row, 'B', "Full Total", ws)
@@ -140,14 +142,16 @@ class Spreadsheet
     summary[:holdings_by_category][category].sort.each do |symbol, block|
       adjustment = summary[:adjustments_by_category][category]
       weight = block[:weight]
-      actual_percentage = block[:value] / summary[:full_total]
-      desired_percentage = (weight / 100.0) * adjustment[:desiredFraction]
       write_cell(row, "B", symbol, ws)
       write_cell(row, "C", block[:value], ws)
-      write_cell(row, "D", actual_percentage, ws)
-      write_cell(row, "E", desired_percentage, ws)
-      write_cell(row, "F", block[:delta], ws)
-      write_cell(row, "G", block[:weight], ws)
+      if adjustment.has_key?(:desiredFraction)
+        actual_percentage = block[:value] / summary[:full_total]
+        desired_percentage = (weight / 100.0) * adjustment[:desiredFraction]
+        write_cell(row, "D", actual_percentage, ws)
+        write_cell(row, "E", desired_percentage, ws)
+        write_cell(row, "F", block[:delta], ws)
+        write_cell(row, "G", block[:weight], ws)
+      end
       row += 1
     end
     return row

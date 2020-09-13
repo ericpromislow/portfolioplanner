@@ -86,7 +86,7 @@ PluginManager.each do |analyzerName, analyzerClass|
   glob = dateObj.strftime(analyzerClass.const_get(:FileNameGlobFormat))
   paths = Dir.glob(File.join(input_dir, glob))
   if paths.size == 0
-    altGlobFormat = analyzerClass.const_get(:FileNameGlobFormatBackup)
+    altGlobFormat = analyzerClass.const_get(:FileNameGlobFormatBackup) rescue nil
     next if !altGlobFormat
     glob = dateObj.strftime(altGlobFormat)
     paths = Dir.glob(File.join(input_dir, glob))

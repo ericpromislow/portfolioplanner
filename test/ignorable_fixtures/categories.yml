@@ -1,0 +1,15 @@
+---
+USEq:
+  desired_weight: 50
+  position: 1
+  symbols:
+    - symbol: SLV
+      desired_weight: 25
+    - symbol: VOO
+      desired_weight: 75
+CASH:
+  desired_weight: 50
+TRADES:
+  position: 2
+  symbols:
+    - symbol: "TSLA 091820 420 C"
