@@ -30,6 +30,10 @@ class Spreadsheet
     rows.each_with_index do |row, i|
       ws.cell("A#{i + 1}").value = row[0]
       ws.cell("B#{i + 1}").value = row[1]
+      if i > 0
+        ws.cell("C#{i + 1}").formula = "=(B#{i + 1}-B#{i})/B#{i}"
+        ws.cell("D#{i + 1}").formula = "=(B#{i + 1}-B$1)/B$1"
+      end
     end
     workbook.save(path)
   end
