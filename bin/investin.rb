@@ -34,6 +34,11 @@ optparse = OptionParser.new do |opts|
   options[:categories] = File.expand_path("../categories.yml", File.dirname($0))
   opts.on('-c', '--categories FILE', 'read categories from FILE') { |path| options[:categories] = path }
 
+  options[:minSources] = 0
+  opts.on('-n', '--minimum-sources INTEGER', 'min # sources to read') { |min|
+    options[:minSources] = min.to_i
+  }
+
   options[:summary] = false
   opts.on('--summary', 'emit a summary to stdout') { options[:summary] = true }
 
@@ -98,8 +103,11 @@ PluginManager.each do |analyzerName, analyzerClass|
     entries: paths.map { |path| deep_symbolize_keys(analyzerClass.new.parse(path)) },
   }
 end
-if sources.size == 0
+total_paths = sources.map{|s| s[:entries].size }.sum
+if total_paths == 0
   abort "No input for date #{date}"
+elsif total_paths < options[:minSources]
+  abort "Expecting at least #{options[:minSources]} sources, only got #{total_paths}"
 end
 
 analyzer = Analyze::Analyzer.new(categories_file)
