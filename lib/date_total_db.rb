@@ -40,7 +40,66 @@ class DateTotalDatabase
   end
 
   def rows
+    latest_month_query = "select max(chart_date) from totals"
+    latest_month_result = @db.execute(latest_month_query)
+    latest_month_as_date = Date.jd(latest_month_result[0][0])
+    ly = latest_month_as_date.year
+    lm = latest_month_as_date.month
+    final_ly, final_lm = (lm <= 2 ? [ly - 1, lm + 10] : [ly, lm - 2])
+
+    all_the_rows = all_rows
+    # Always keep the first row
+    final_rows = [all_the_rows.shift]
+
+    all_the_rows = all_the_rows.map do |dateString, value|
+      date = DateTime.parse(dateString)
+      [date.year, date.month, dateString, value]
+    end
+    first_row = all_the_rows.shift
+    curr_year = first_row[0]
+    curr_month = first_row[1]
+    curr_min_value = curr_max_value = first_row[3]
+    curr_min = first_row
+    curr_max = first_row
+
+    keep_index = all_the_rows.find_index { |year, month, _, _ |
+      (year == final_ly && month > final_lm) || year > final_ly
+    }
+    rows_to_filter = all_the_rows[0 ... keep_index]
+    rows_to_keep = all_the_rows[keep_index .. -1]
+
+    rows_to_filter.each do |row|
+      year, month, _, value = row
+      if curr_year < year || curr_month < month
+        final_rows += sort_rows(curr_min_value, curr_min, curr_max_value, curr_max)
+        curr_year = year
+        curr_month = month
+        curr_min_value = curr_max_value = value
+        curr_min = curr_max = row
+      else
+        if curr_min_value < value
+          curr_min_value = value
+          curr_min = row
+        elsif curr_max_value > value
+          curr_max_value = value
+          curr_max = row
+        end
+      end
+    end
+    final_rows += sort_rows(curr_min_value, curr_min, curr_max_value, curr_max)
+    final_rows += rows_to_keep.map{|x| x[2..3]}
+    final_rows
+  end
+
+  def all_rows
     result = @db.execute("select * from totals order by chart_date ASC")
     result.map { |row| [ Date.jd(row[0]).to_s, row[1]] }
+  end
+
+  private
+
+  def sort_rows(curr_min_value, curr_min, curr_max_value, curr_max)
+    return [curr_min[2..3]] if curr_min_value == curr_max_value
+    return [curr_min[2..3], curr_max[2..3]].sort
   end
 end
