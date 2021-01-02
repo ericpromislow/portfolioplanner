@@ -26,16 +26,30 @@ class Spreadsheet
   def update_totals(db, path)
     workbook = Rspreadsheet.new
     ws = workbook.create_worksheet
-    rows = db.rows
-    rows.each_with_index do |row, i|
-      ws.cell("A#{i + 1}").value = row[0]
-      ws.cell("B#{i + 1}").value = row[1]
-      if i > 0
-        ws.cell("C#{i + 1}").formula = "=(B#{i + 1}-B#{i})/B#{i}"
-        ws.cell("D#{i + 1}").formula = "=(B#{i + 1}-B$1)/B$1"
+    begin
+      rows = db.rows
+      return if rows.size == 0
+      row = rows.shift
+      ws.cell("A1").value = row[0]
+      ws.cell("B1").value = row[1]
+      yearStartIndex = 1
+      currYear = row[0][0..3]
+      rows.each_with_index do |row, i|
+        thisRow = i + 2
+        prevRow = i + 1
+        ws.cell("A#{thisRow}").value = row[0]
+        ws.cell("B#{thisRow}").value = row[1]
+        ws.cell("C#{thisRow}").formula = "=(B#{thisRow}-B#{prevRow})/B#{prevRow}"
+        ws.cell("D#{thisRow}").formula = "=(B#{thisRow}-B$#{yearStartIndex})/B$#{yearStartIndex}"
+        testYear = row[0][0..3]
+        if testYear != currYear
+          currYear = testYear
+          yearStartIndex = thisRow
+        end
       end
+    ensure
+      workbook.save(path)
     end
-    workbook.save(path)
   end
 
   private
@@ -75,11 +89,11 @@ class Spreadsheet
     write_bold_cell(row, 'B', "Full Total", ws)
     %w/C D E F/.each do |col|
       write_bold_formula(row, col,
-        @summary_rows.map{|row| cellFromRCAlpha(row, col) }.join("+"), ws)
+        @summary_rows.map {|row| cellFromRCAlpha(row, col)}.join("+"), ws)
     end
   end
 
-  def write_total_for_category(adjustment, first_row, row, ws, have_items=true)
+  def write_total_for_category(adjustment, first_row, row, ws, have_items = true)
     write_bold_cell(row, 'B', "Total", ws)
     write_bold_cell(row, 'C', adjustment[:total], ws)
     write_bold_cell(row, 'D', adjustment[:actualFraction], ws)
@@ -90,7 +104,7 @@ class Spreadsheet
       cell.formula = "=sum(%s:%s)" % [cellFromRCAlpha(first_row, "G"), cellFromRCAlpha(row - 1, "G")]
       cell.format.bold = true
 
-      (first_row .. row - 1).to_a.each do |this_row|
+      (first_row..row - 1).to_a.each do |this_row|
         cell = ws.cell(cellFromRCAlpha(this_row, "H"))
         cell.formula = "=" + "(G%d/G$%d)*E$%d" % [this_row, row, row]
         cell = ws.cell(cellFromRCAlpha(this_row, "I"))
@@ -131,7 +145,7 @@ class Spreadsheet
 
   def write_header(row, ws)
     ['Category', nil, nil, 'Actual %', 'Target %', 'Move', 'Category Weight',
-    'Revised Target', 'Revised Move'].each_with_index do |val, i|
+      'Revised Target', 'Revised Move'].each_with_index do |val, i|
       next if val.nil?
       ws.cell(cellFromRCZero(row, i)).value = val
     end
