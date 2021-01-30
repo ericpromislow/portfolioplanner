@@ -154,14 +154,17 @@ module Analyze
         full_ratio = 0.0
         running_deltas = 0.0
         h = {}
+        active_full_total = @full_total - @ignorable_total
+        if active_full_total == 0
+          abort("Nothing to summarize. Go buy some stocks or something.")
+        end
         @categories.each do |category, total|
           if category == :TRADES
             h[category] = {
               total: total,
             }
           else
-            active_full_total = @full_total - @ignorable_total
-            next if active_full_total == 0 || category == :TRADES
+            next if category == :TRADES
             actual_fraction = total/active_full_total
             full_ratio += actual_fraction
             desired_percentage = @desired_weights_by_category[category]

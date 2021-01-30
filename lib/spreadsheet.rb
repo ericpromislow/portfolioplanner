@@ -159,7 +159,7 @@ class Spreadsheet
       write_cell(row, "B", symbol, ws)
       write_cell(row, "C", block[:value], ws)
       if adjustment.has_key?(:desiredFraction)
-        actual_percentage = block[:value] / summary[:full_total]
+        actual_percentage = block[:value] / (summary[:full_total] - summary[:ignorable_total])
         desired_percentage = (weight / 100.0) * adjustment[:desiredFraction]
         write_cell(row, "D", actual_percentage, ws)
         write_cell(row, "E", desired_percentage, ws)
