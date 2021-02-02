@@ -67,10 +67,20 @@ class DateTotalDatabase
     }
     rows_to_filter = all_the_rows[0 ... keep_index]
     rows_to_keep = all_the_rows[keep_index .. -1]
+    first_row = nil
 
     rows_to_filter.each do |row|
       year, month, _, value = row
       if curr_year < year || curr_month < month
+        if first_row
+          if first_row[2] < curr_min[2]
+            final_rows << first_row[2..3]
+          end
+          first_row = nil
+        end
+        if curr_year < year
+          first_row = row
+        end
         final_rows += sort_rows(curr_min_value, curr_min, curr_max_value, curr_max)
         curr_year = year
         curr_month = month
@@ -85,6 +95,9 @@ class DateTotalDatabase
           curr_max = row
         end
       end
+    end
+    if first_row && first_row[2] < curr_min[2]
+      final_rows << first_row[2..3]
     end
     final_rows += sort_rows(curr_min_value, curr_min, curr_max_value, curr_max)
     final_rows += rows_to_keep.map{|x| x[2..3]}
