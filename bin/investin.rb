@@ -3,9 +3,15 @@
 # get and parse csv files for the specified date
 # emit a bunch of yaml
 
+# Typical command:
+# rm -f tmp/totals.ods
+# ruby ./bin/investin.rb -d YYYY-MM-DD -n 6 -s tmp/full-summary-YYYY-MM-DDa.ods
+
 require 'date'
 require 'optparse'
 require 'yaml'
+
+VERSION='1.0.0'
 
 $: << File.expand_path("../lib", File.dirname($0))
 
@@ -47,6 +53,11 @@ optparse = OptionParser.new do |opts|
 
   options[:forceOverwrite] = false
   opts.on('-f', '--force-overwrite', 'overwrite existing spreadsheet') { options[:forceOverwrite] = true }
+
+  opts.on('-v', '--version') do
+    puts VERSION
+    exit 0
+  end
 
   opts.on('-h', '--help') do
     puts opts

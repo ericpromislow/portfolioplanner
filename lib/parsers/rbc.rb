@@ -12,7 +12,7 @@ module Parsers
       entry = createEntry()
       total_idx = 3
       state = 1
-      CSV.foreach(path, skip_lines: /"Holdings Export as of \w+ \d+, \d+ [\d:]+ \wM ET"/) do |row|
+      CSV.foreach(path, encoding:'bom|utf-8', skip_lines: /"Holdings Export as of \w+ \d+, \d+ [\d:]+ \wM ET"/) do |row|
         next if row.size == 0
         next if row[0..10].all?(&:nil?)
         if state == 1

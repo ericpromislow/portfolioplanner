@@ -14,7 +14,7 @@ module Parsers
       entry = createEntry()
       state = 1
       currency = :CAD
-      CSV.foreach(path) do |row|
+      CSV.foreach(path, encoding:'bom|utf-8') do |row|
         next if row.size == 0
         next if row[0..10].all?(&:nil?)
         if state == 1
