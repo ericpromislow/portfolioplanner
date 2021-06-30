@@ -6,6 +6,7 @@
 # Typical command:
 # rm -f tmp/totals.ods
 # ruby ./bin/investin.rb -d YYYY-MM-DD -n 6 -s tmp/full-summary-YYYY-MM-DDa.ods
+# rm -f tmp/totals.ods ; ruby bin/investin.rb -d 2021-06-27 -n 6 -s tmp/full-summary-2021-06-27a.ods
 
 require 'date'
 require 'optparse'
