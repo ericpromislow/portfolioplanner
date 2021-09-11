@@ -8,22 +8,11 @@ module Parsers
 
     FileNameGlobFormat = "Holdings [A-Z0-9]* %B %-d, %Y.csv"
 
-    def fixSymbol(path)
-      contents = IO.read(path, encoding:'bom|utf-8')
-      c2 = contents.sub(/function Symbol\(\)\s+\{.*?\},/mu, 'Symbol,')
-      if c2.size == contents.size
-        $stderr.puts("*** Hey prob no need to fix symbols now")
-      end
-      return c2
-    end
-
     def parse(path)
       entry = createEntry()
       total_idx = 3
       state = 1
-      CSV.parse(fixSymbol(path)) do |row|
-      # lines = fixSymbol(path)
-      # CSV.foreach(path, encoding:'bom|utf-8', skip_lines: /"Holdings Export as of \w+ \d+, \d+ [\d:]+ \wM ET"/) do |row|
+      CSV.foreach(path, encoding:'bom|utf-8', skip_lines: /"Holdings Export as of \w+ \d+, \d+ [\d:]+ \wM ET"/) do |row|
         next if row.size == 0
         next if row[0..10].all?(&:nil?)
         if state == 1
