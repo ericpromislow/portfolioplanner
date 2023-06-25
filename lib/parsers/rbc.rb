@@ -1,7 +1,15 @@
+# encoding: utf-8
 # parse rbc cvs files, return a hash 
 
 require 'base_parser'
 require 'csv'
+
+# states:
+# 1: initial, default
+# 2: saw Account
+# 3: in 2, saw Exchange Rate
+# 4: Saw Currency,Cash,Inv header
+# 5: in 4, saw .../Product/Symbol
 
 module Parsers
   class RBC < BaseParser
@@ -10,7 +18,8 @@ module Parsers
 
     def fixSymbol(path)
       contents = IO.read(path, encoding:'bom|utf-8')
-      c2 = contents.sub(/function Symbol\(\)\s+\{.*?\},/mu, 'Symbol,')
+      # c2 = contents.sub(/function Symbol\(\)\s+\{.*?\},/mu, 'Symbol,')
+      c2 = contents.sub(/,Product,function.+?,Name,/mu, ',Product,Symbol,Name,')
       if c2.size == contents.size
         $stderr.puts("*** Hey prob no need to fix symbols now")
       end
@@ -32,12 +41,12 @@ module Parsers
             entry[:accountNum] = m[1]
             state = 2
           end
-        elsif state == 2
-          if row[0] =~ /Exchange Rate: 1 USD = ([\d\.]+) CAD/
+        elsif state == 2 || state == 3 
+          if state == 2 && row[0] =~ /Exchange Rate: 1 USD = ([\d\.]+) CAD/
             entry[:usrate] = $1.to_f
             state = 3
+            continue
           end
-        elsif state == 3
           if row[0..2].join(',') == 'Currency,Cash,Investments'
             total_idx = row.find_index("Total")
             state = 4
@@ -52,6 +61,9 @@ module Parsers
           entry[:cash][currency] = row[1]
           entry[:stated_totals][currency] = row[total_idx]
           entry[:stated_investments][currency] = row[2]
+          if row[0] == 'USD'
+            entry[:usrate] = row[4].to_f            
+          end
         elsif state == 5
           break if row[0] == "Important Information"
           if row.size > 20

@@ -149,7 +149,10 @@ if (spreadsheet_location = options[:spreadsheet])
   db = DateTotalDatabase.new(input_dir, "totals.db")
   begin
     db.add(date, total)
+    t1 = Time.now
     spreadsheeter.update_totals(db, totals_path)
+    t2 = Time.now
+    puts "Time to update totals: #{ (t2 - t1) } secs"
     system(%Q/open "#{totals_path}"/)
   ensure
     db.close
