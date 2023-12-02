@@ -80,7 +80,6 @@ module Analyze
 
           # CASH
           
-          cash_total = 0
           cdn_cash = entry[:cash][:CAD].to_f
           adjusted_cash_total = cdn_cash
           us_cash = entry[:cash][:USD].to_f
