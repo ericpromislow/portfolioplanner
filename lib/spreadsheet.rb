@@ -27,7 +27,7 @@ class Spreadsheet
     workbook = Rspreadsheet.new
     ws = workbook.create_worksheet
     begin
-      rows = db.rows
+      rows = db.reduced_rows
       return if rows.size == 0
       row = rows.shift
       ws.cell("A1").value = row[0]

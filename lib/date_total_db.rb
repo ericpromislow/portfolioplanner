@@ -39,6 +39,78 @@ class DateTotalDatabase
     @db.close
   end
 
+  def daysInMonth(year, month)
+    [nil, 31, year % 4 == 0 ? 29 : 28, 31, 30,
+     31, 30, 31, 31,
+     30, 31, 30, 31][month] or abort("Can't find # days for date #{year}/#{month}")
+  end
+
+  def addRows(rows, firstJD, lastJD)
+    resMin = @db.execute("select min(chart_date), total_value from totals where chart_date >= #{ firstJD} and chart_date <= #{ lastJD }")[0]
+    rows << resMin if resMin
+    resMax = @db.execute("select max(chart_date), total_value from totals where chart_date >= #{firstJD} and chart_date <= #{lastJD}")[0]
+    rows << resMax if resMax and resMax[0] != resMin[0]
+  end
+
+  def reduced_rows
+    today = Date.today
+    thisYear = today.year
+    thisMonth = today.month
+    border2Month = thisMonth - 1
+    border2Year = thisYear
+    if border2Month < 1
+      border2Year -= 1
+      border2Month += 12
+    end
+    border1Year = border2Year - 1
+    border1Month = border2Month
+    
+    firstDateEntry = @db.execute("select min(chart_date), total_value from totals")[0]
+    firstDate = Date.jd(firstDateEntry[0])
+    final_rows = [firstDateEntry]
+    year = firstDate.year
+    month = firstDate.month
+    while year < border1Year
+      firstJD = year == firstDate.year ? firstDateEntry[0] + 1 : Date.parse("#{year}-1-1").jd
+      lastJD = Date.parse("#{year}-12-31").jd
+      addRows(final_rows, firstJD, lastJD)
+      year += 1
+    end
+    if border1Month > 1
+      firstJD = Date.parse("#{year}-01-01").jd
+      lastJD = Date.parse("#{year}-#{border1Month}-#{daysInMonth(year, border1Month)}").jd
+      addRows(final_rows, firstJD, lastJD)
+      month = border1Month + 1
+      if month > 12
+        year += 1
+        month = 1
+      end
+    end
+
+    while year < border2Year || year == border2Year && month < border2Month
+      firstJD = Date.parse("#{year}-#{month}-1}").jd
+      lastJD = Date.parse("#{year}-#{month}-#{daysInMonth(year, month)}").jd
+      addRows(final_rows, firstJD, lastJD)
+      month += 1
+      if month == 13
+        month = 1
+        year += 1
+      end
+    end
+      
+    today = Date.today
+    thisYear = today.year
+    thisMonth = today.month
+    firstJD = Date.parse("#{year}-#{month}-1").jd
+    lastJD = Date.parse("#{thisYear}-#{thisMonth}-#{today.day}").jd
+    res = @db.execute("select chart_date, total_value from totals where chart_date >= #{firstJD} and chart_date <= #{lastJD}")
+    final_rows += res
+    final_rows.map do |dateJD, value|
+      dateString = Date.jd(dateJD).to_s
+      [dateString, value]
+    end
+  end
+                    
   def rows
     latest_month_query = "select max(chart_date) from totals"
     latest_month_result = @db.execute(latest_month_query)
