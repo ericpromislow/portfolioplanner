@@ -85,9 +85,11 @@ class DateTotalDatabase
         year += 1
         month = 1
       end
+    else
+      month = border1Month
     end
 
-    while year < border2Year || year == border2Year && month < border2Month
+    while year < border2Year || (year == border2Year && month < border2Month)
       firstJD = Date.parse("#{year}-#{month}-1}").jd
       lastJD = Date.parse("#{year}-#{month}-#{daysInMonth(year, month)}").jd
       addRows(final_rows, firstJD, lastJD)
